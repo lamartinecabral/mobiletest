@@ -5,13 +5,15 @@
 			position: absolute;
 			left: 50%;
 			transform: translateX(-50%);
-			padding-top: 3em;
 		}
 		div{
 			font-family: monospace;
 		}
 		ul{
 			text-align: start;
+		}
+		textarea{
+			white-space: pre;
 		}
 	</style>
 	<script type="text/javascript" src="./eruda.js"></script>
@@ -27,6 +29,19 @@
 				<li><a href="https://github.com/ReactiveX/rxjs">RxJS</a></li>
 				<li><a href="https://momentjs.com/">Moment.js</a></li>
 			</ul>
+			
+			<label for="eval">eval</label><br>
+			<textarea name="eval" id="eval" cols="30" rows="10"></textarea><br>
+			<button onclick="cleareval()">clear</button>
+			<button onclick="run()">run</button><br>
+			<label for="output">output</label><br>
+			<textarea name="output" id="output" cols="30" rows="10" readonly></textarea><br>
+			<button onclick="clearoutput()">clear</button><br>
 		</div>
 	</body>
+	<script>
+		document.querySelector("#eval").value = localStorage.getItem("eval");
+		document.querySelector("#eval").onkeyup = identation;
+		document.querySelector("#eval").onkeydown = tabinput;
+	</script>
 </html>
