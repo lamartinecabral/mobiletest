@@ -5,6 +5,7 @@
 			position: absolute;
 			left: 50%;
 			transform: translateX(-50%);
+			padding-bottom: 3em;
 		}
 		div{
 			font-family: monospace;
@@ -16,12 +17,22 @@
 			white-space: pre;
 		}
 	</style>
-	<script type="text/javascript" src="./eruda.js"></script>
-	<script type="text/javascript" src="./rxjs.umd.min.js"></script>
-	<script type="text/javascript" src="./moment-with-locales.min.js"></script>
-	<script type="text/javascript" src="./main.js"></script>
 	<body>
 		<div class="center">
+			
+			<label for="eval">eval</label><br>
+			<textarea name="eval" id="eval" cols="46" rows="20" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea><br>
+			<button onclick="cleareval()">clear</button>
+			<button onclick="run()">run</button>
+			<div style="display: inline; display: inline-flex; align-items: center;">
+				<input type="checkbox" id="time" name="time">
+				<label for="time">time</label>
+			</div>
+			<br>
+			<label for="output">output</label><br>
+			<textarea name="output" id="output" cols="46" rows="15" readonly></textarea><br>
+			<button onclick="clearoutput()">clear</button><br>
+			
 			<h2>Just a little thing to experiment some codes while on mobile</h2>
 			<p>packages included:</p>
 			<ul>
@@ -30,18 +41,10 @@
 				<li><a href="https://momentjs.com/">Moment.js</a></li>
 			</ul>
 			
-			<label for="eval">eval</label><br>
-			<textarea name="eval" id="eval" cols="30" rows="10" autocapitalize="off"></textarea><br>
-			<button onclick="cleareval()">clear</button>
-			<button onclick="run()">run</button><br>
-			<label for="output">output</label><br>
-			<textarea name="output" id="output" cols="30" rows="10" readonly></textarea><br>
-			<button onclick="clearoutput()">clear</button><br>
 		</div>
 	</body>
-	<script>
-		document.querySelector("#eval").value = localStorage.getItem("eval");
-		document.querySelector("#eval").onkeyup = identation;
-		document.querySelector("#eval").onkeydown = tabinput;
-	</script>
+	<script type="text/javascript" src="./eruda.js"></script>
+	<script type="text/javascript" src="./rxjs.umd.min.js"></script>
+	<script type="text/javascript" src="./moment-with-locales.min.js"></script>
+	<script type="text/javascript" src="./main.js"></script>
 </html>

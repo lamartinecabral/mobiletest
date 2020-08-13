@@ -1,40 +1,45 @@
-console.log('eruda', eruda, eruda.init() );
-console.log('rxjs', rxjs)
-console.log('moment()', moment())
-
 function run(){
-	let e = document.querySelector("#eval").value;
-	localStorage.setItem("eval", e);
+	var e = document.getElementById("eval").value;
+	try {
+		localStorage.setItem("eval", e);
+	} catch(e) { console.error(e); }
 	e = e.replace(/\n/g," ");
 	e = e.replace(/console\.log/g,"consolelog");
-	// console.log(e);
-	consolelog(eval(e));
+	e = e.replace(/console\.clear/g,"clearoutput");
+	try {
+		var before = new Date();
+		var res = eval(e);
+		if(res) consolelog(res);
+		var after = new Date();
+		if(document.getElementById("time").checked)
+			consolelog(after-before+"ms");
+	} catch(e){ console.error(e); }
 }
 
 function consolelog(...args){
-	let o = document.querySelector("#output");
-	for(let arg of args){
+	var o = document.getElementById("output");
+	for(var arg of args){
 		console.log(arg);
-		o.value += JSON.stringify(arg)+"\n";
+		if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
+		else o.value += arg+"\n";
 	}
 }
 
 function cleareval(){
-	document.querySelector("#eval").value = "";
+	document.getElementById("eval").value = "";
 }
 
 function clearoutput(){
-	document.querySelector("#output").value = "";
+	document.getElementById("output").value = "";
 }
 
 function identation(ev){
 	if(ev.keyCode === 13){
-		let {value, selectionStart} = ev.target;
+		var {value, selectionStart} = ev.target;
 		value = [value.slice(0,selectionStart), value.slice(selectionStart)];
-		// console.log(value, selectionStart);
-		let lines = value[0].split("\n");
+		var lines = value[0].split("\n");
 		if(lines.length < 2) return;
-		for(let c of lines[lines.length-2]){
+		for(var c of lines[lines.length-2]){
 			if(c != " " && c != "\t") break;
 			lines[lines.length-1] = c + lines[lines.length-1];
 			selectionStart++;
@@ -49,7 +54,7 @@ function identation(ev){
 function tabinput(ev){
 	if(ev.keyCode === 9){
 		ev.preventDefault();
-		let {value, selectionStart} = ev.target;
+		var {value, selectionStart} = ev.target;
 		value = [value.slice(0,selectionStart), value.slice(selectionStart)];
 		value[0] += "  ";
 		selectionStart += 2;
@@ -58,3 +63,19 @@ function tabinput(ev){
 		ev.target.selectionEnd = selectionStart;
 	}
 }
+
+try {
+	console.log('eruda', eruda, eruda.init() );
+} catch(e){ console.error(e); }
+try {
+	console.log('rxjs', rxjs);
+} catch(e){ console.error(e); }
+try {
+	console.log('moment()', moment());
+} catch(e){ console.error(e); }
+
+try {
+	document.getElementById("eval").value = localStorage.getItem("eval");
+} catch(e){ console.error(e); }
+document.getElementById("eval").onkeyup = identation;
+document.getElementById("eval").onkeydown = tabinput;
