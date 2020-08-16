@@ -4,7 +4,7 @@
 		<link rel="icon" type="image/ico" href="./assets/favicon.ico"/>
 		<link rel="manifest" href="./manifest.webmanifest">
 		<link rel="stylesheet" type="text/css" href="./style.css">
-		<script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js', {scope: '/mobiletest/'}); };</script>
+		<script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js', {scope: '/'}); };</script>
 	</head>
 	<body>
 		<div class="center">
@@ -31,8 +31,8 @@
 			
 		</div>
 	</body>
-	<script type="text/javascript" src="./assets/eruda.js"></script>
-	<script type="text/javascript" src="./assets/rxjs.umd.min.js"></script>
-	<script type="text/javascript" src="./assets/moment-with-locales.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/eruda"></script>
+	<script type="text/javascript" src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+	<script type="text/javascript" src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
 	<script type="text/javascript" src="./main.js"></script>
 </html>
