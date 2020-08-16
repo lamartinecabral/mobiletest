@@ -4,7 +4,7 @@
     "description": "Just a little thing to test some codes while on mobile.",
     "icons": [
         {
-            "src": "./icon.png",
+            "src": "./assets/icon.png",
             "sizes": "648x648",
             "type": "image/png"
         }

@@ -13,15 +13,15 @@ self.addEventListener('install', function(e) {
               './assets/eruda.js.map',
               './assets/favicon.ico',
               './assets/icon.png',
-              './index.html',
-              './main.js',
-              './manifest.webmanifest',
+              // './index.html',
+              // './main.js',
+              // './manifest.webmanifest',
               './assets/moment-with-locales.min.js',
               './assets/moment-with-locales.min.js.map',
               './assets/rxjs.umd.min.js',
               './assets/rxjs.umd.min.js.map',
-              './style.css',
-              './sw.js',
+              // './style.css',
+              // './sw.js',
             ]).then(function() {
                 console.log("all cached");
                 self.skipWaiting();
