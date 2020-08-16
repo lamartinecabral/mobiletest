@@ -1,0 +1,16 @@
+{
+    "name": "Mobile Test",
+    "short_name": "mobiletest",
+    "description": "Just a little thing to test some codes while on mobile.",
+    "icons": [
+        {
+            "src": "./icon.png",
+            "sizes": "648x648",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "/",
+    "display": "standalone",
+    "theme_color": "#888888",
+    "background_color": "#888888"
+}
