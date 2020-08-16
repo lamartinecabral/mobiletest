@@ -1,71 +1,42 @@
-const precacheVersion = '1.0';
-const precacheName = 'precache-v' + precacheVersion;
-const precacheFiles = [
-'./eruda.js',
-'./eruda.js.map',
-'./favicon.ico',
-'./icon.png',
-'./index.html',
-'./main.js',
-'./manifest.webmanifest',
-'./moment-with-locales.min.js',
-'./moment-with-locales.min.js.map',
-'./rxjs.umd.min.js',
-'./rxjs.umd.min.js.map',
-'./sw.js',
-];
+// use a cacheName for cache versioning
+var cacheName = 'v1:static';
 
-self.addEventListener('install', (e) => {
-  console.log('[ServiceWorker] Installed');
-
-  self.skipWaiting();
-
-  e.waitUntil(
-    caches.open(precacheName).then((cache) => {
-      console.log('[ServiceWorker] Precaching files');
-      return cache.addAll(precacheFiles);
-    }) // end caches.open()
-  ); // end e.waitUntil
+// during the install phase you usually want to cache static assets
+self.addEventListener('install', function(e) {
+    // once the SW is installed, go ahead and fetch the resources to make this work offline
+    e.waitUntil(
+        caches.open(cacheName).then(function(cache) {
+            return cache.addAll([
+              './eruda.js',
+              './eruda.js.map',
+              './favicon.ico',
+              './icon.png',
+              './index.html',
+              './main.js',
+              './manifest.webmanifest',
+              './moment-with-locales.min.js',
+              './moment-with-locales.min.js.map',
+              './rxjs.umd.min.js',
+              './rxjs.umd.min.js.map',
+              './sw.js',
+            ]).then(function() {
+                self.skipWaiting();
+            });
+        })
+    );
 });
 
-
-self.addEventListener('activate', (e) => {
-  console.log('[ServiceWorker] Activated');
-
-  e.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(cacheNames.map((thisCacheName) => {
-
-        console.log(thisCacheName +' = '+precacheName)
-
-        if (thisCacheName.includes("precache") && thisCacheName !== precacheName) {
-          console.log('[ServiceWorker] Removing cached files from old cache - ', thisCacheName);
-          return caches.delete(thisCacheName);
-        }
-
-      }));
-    }) // end caches.keys()
-  ); // end e.waitUntil
+// when the browser fetches a url
+self.addEventListener('fetch', function(event) {
+    // either respond with the cached object or go ahead and fetch the actual url
+    event.respondWith(
+        caches.match(event.request).then(function(response) {
+            if (response) {
+                // retrieve from cache
+                return response;
+            }
+            // fetch as normal
+            return fetch(event.request);
+        })
+    );
 });
-
-
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((cacheResponse) => {
-      if(cacheResponse) {
-        console.log('Found in cache!')
-        return cacheResponse
-      }
-      return fetch(e.request)
-        .then((fetchResponse) => fetchResponse)
-        .catch((err) => {
-
-          const isHTMLPage = e.request.method == "GET" && e.request.headers.get("accept").includes("text/html");
-
-          if (isHTMLPage) return caches.match("/index.html")
-
-        });
-    })
-  );
-});
-        
