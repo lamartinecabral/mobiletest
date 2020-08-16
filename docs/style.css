@@ -1,0 +1,16 @@
+.center{
+	text-align: center;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	padding-bottom: 3em;
+}
+div{
+	font-family: monospace;
+}
+ul{
+	text-align: start;
+}
+textarea{
+	white-space: pre;
+}

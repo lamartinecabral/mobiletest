@@ -9,17 +9,18 @@ self.addEventListener('install', function(e) {
         caches.open(cacheName).then(function(cache) {
             console.log("caches open", {cache});
             return cache.addAll([
-              './eruda.js',
-              './eruda.js.map',
-              './favicon.ico',
-              './icon.png',
+              './assets/eruda.js',
+              './assets/eruda.js.map',
+              './assets/favicon.ico',
+              './assets/icon.png',
               './index.html',
               './main.js',
               './manifest.webmanifest',
-              './moment-with-locales.min.js',
-              './moment-with-locales.min.js.map',
-              './rxjs.umd.min.js',
-              './rxjs.umd.min.js.map',
+              './assets/moment-with-locales.min.js',
+              './assets/moment-with-locales.min.js.map',
+              './assets/rxjs.umd.min.js',
+              './assets/rxjs.umd.min.js.map',
+              './style.css',
               './sw.js',
             ]).then(function() {
                 console.log("all cached");
