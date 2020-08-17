@@ -3,10 +3,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
 		<!-- <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js', {scope: '/'}); };</script> -->
 		<script>
-alert("start2");
+alert("start3");
 function run(){
 	var e = document.getElementById("eval").value;
-	alert(eval(e));
+	var o = document.getElementById("output");
+	o.value += eval(e)+"\n";
 }
 		</script>
 		<link rel="icon" type="image/ico" href="./assets/favicon.ico"/>
@@ -18,7 +19,7 @@ function run(){
 			
 			<label for="eval">eval</label><br>
 			<textarea name="eval" id="eval" cols="42" rows="20" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeyup="identation(event)" onkeydown="tabinput(event)"></textarea><br>
-			<button onclick="run()">run</button> 
+			<button onclick="run()">run</button>
 			<div style="display: inline; display: inline-flex; align-items: center;">
 				<input type="checkbox" id="time" name="time">
 				<label for="time">time</label>
