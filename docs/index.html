@@ -3,7 +3,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
 		<!-- <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js', {scope: '/'}); };</script> -->
 		<script>
-alert("start7");
+alert("start8");
 function run(){
 	var e = document.getElementById("eval").value;
 	try {
@@ -21,22 +21,24 @@ function run(){
 			consolelog(after-before+"ms");
 	} catch(e){ console.error(e); }
 }
-function consolelog(){
+function consolelog(arg){
 	var o = document.getElementById("output");
-	arguments.forEach(function(arg){
+// 	arguments.forEach(function(arg){
 		console.log(arg);
 		if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
 		else o.value += arg+"\n";
-	});
+// 	});
 }
 function clearoutput(){
 	document.getElementById("output").value = "";
 }
-setTimeout(function(){
+function initEval(first){
 	try {
-		document.getElementById("eval").value = localStorage.getItem("eval");
+		if(!localStorage.getItem("eval") && first) else setTimeout(function(){initEval(false)},1000);
+		else document.getElementById("eval").value = localStorage.getItem("eval");
 	} catch(e){ console.error(e); }
-},1000);
+}
+initEval(true);
 		</script>
 		<link rel="icon" type="image/ico" href="./assets/favicon.ico"/>
 		<link rel="manifest" href="./manifest.webmanifest">
