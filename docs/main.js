@@ -1,5 +1,6 @@
 function run(){
 	var e = document.getElementById("eval").value;
+	return alert(eval(e));
 	try {
 		localStorage.setItem("eval", e);
 	} catch(e) { console.error(e); }
