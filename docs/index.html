@@ -21,13 +21,13 @@ function run(){
 			consolelog(after-before+"ms");
 	} catch(e){ console.error(e); }
 }
-function consolelog(){
+function consolelog(arg){
 	var o = document.getElementById("output");
-	for(var arg of arguments){
+// 	for(var arg of arguments){
 		console.log(arg);
 		if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
 		else o.value += arg+"\n";
-	}
+// 	}
 }
 function clearoutput(){
 	document.getElementById("output").value = "";
