@@ -32,13 +32,18 @@ function consolelog(arg){
 function clearoutput(){
 	document.getElementById("output").value = "";
 }
-function initEval(first){
-	try {
-		if(!localStorage.getItem("eval") && first) else setTimeout(function(){initEval(false)},1000);
-		else document.getElementById("eval").value = localStorage.getItem("eval");
-	} catch(e){ console.error(e); }
-}
-initEval(true);
+// function initEval(first){
+// 	try {
+// 		if(!localStorage.getItem("eval") && first) else setTimeout(function(){initEval(false)},1000);
+// 		else document.getElementById("eval").value = localStorage.getItem("eval");
+// 	} catch(e){ console.error(e); }
+// }
+// initEval(true);
+try {
+// 	if(!localStorage.getItem("eval") && first) else setTimeout(function(){initEval(false)},1000);
+// 	else 
+		document.getElementById("eval").value = localStorage.getItem("eval");
+} catch(e){ console.error(e); }
 		</script>
 		<link rel="icon" type="image/ico" href="./assets/favicon.ico"/>
 		<link rel="manifest" href="./manifest.webmanifest">
