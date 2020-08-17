@@ -2,34 +2,6 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
 		<!-- <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js', {scope: '/'}); };</script> -->
-		<script>
-			function run2(){
-				var e = document.getElementById("eval").value;
-				try {
-					localStorage.setItem("eval", e);
-				} catch(e) { console.error(e); }
-				e = e.replace(/\n/g," ");
-				e = e.replace(/console\.log/g,"consolelog");
-				e = e.replace(/console\.clear/g,"clearoutput");
-				try {
-					var before = new Date();
-					var res = eval(e);
-					if(res) consolelog(res);
-					var after = new Date();
-					if(document.getElementById("time").checked)
-						consolelog(after-before+"ms");
-				} catch(e){ console.error(e); }
-			}
-			if(navigator){
-				if(navigator.appVersion){
-					alert(eval("'mobiletest2. '")+navigator.appVersion);
-				} else {
-					alert("not even navigator.appVersion");
-				}
-			} else {
-				alert("not even navigator");
-			}
-		</script>
 		<link rel="icon" type="image/ico" href="./assets/favicon.ico"/>
 		<link rel="manifest" href="./manifest.webmanifest">
 		<link rel="stylesheet" type="text/css" href="./style.css">
