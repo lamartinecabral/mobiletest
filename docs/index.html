@@ -3,7 +3,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
 		<!-- <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js', {scope: '/'}); };</script> -->
 		<script>
-alert("start5");
+alert("start6");
 function run(){
 	var e = document.getElementById("eval").value;
 	try {
@@ -21,17 +21,22 @@ function run(){
 			consolelog(after-before+"ms");
 	} catch(e){ console.error(e); }
 }
-function consolelog(arg){
+function consolelog(){
 	var o = document.getElementById("output");
-	if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
-	else o.value += arg+"\n";
+	for(var arg of arguments){
+		console.log(arg);
+		if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
+		else o.value += arg+"\n";
+	}
 }
 function clearoutput(){
 	document.getElementById("output").value = "";
 }
-try {
-	document.getElementById("eval").value = localStorage.getItem("eval");
-} catch(e){ console.error(e); }
+setTimeout(function(){
+	try {
+		document.getElementById("eval").value = localStorage.getItem("eval");
+	} catch(e){ console.error(e); }
+},1000);
 		</script>
 		<link rel="icon" type="image/ico" href="./assets/favicon.ico"/>
 		<link rel="manifest" href="./manifest.webmanifest">
