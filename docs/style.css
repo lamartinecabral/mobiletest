@@ -6,11 +6,12 @@
 	padding-bottom: 3em;
 }
 div{
-	font-family: monospace;
+	font-family: inherit;
 }
 ul{
 	text-align: start;
 }
 textarea{
 	white-space: pre;
+	max-width: 90vw;
 }
