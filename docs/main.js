@@ -1,4 +1,3 @@
-alert("main started");
 function run(){
 	var e = document.getElementById("eval").value;
 	try {
