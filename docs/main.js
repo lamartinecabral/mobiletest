@@ -77,5 +77,3 @@ try {
 try {
 	document.getElementById("eval").value = localStorage.getItem("eval");
 } catch(e){ console.error(e); }
-document.getElementById("eval").onkeyup = identation;
-document.getElementById("eval").onkeydown = tabinput;
