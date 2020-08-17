@@ -4,6 +4,32 @@
 		<!-- <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js', {scope: '/'}); };</script> -->
 		<script>
 alert("start1");
+function run(){
+	var e = document.getElementById("eval").value;
+	try {
+		localStorage.setItem("eval", e);
+	} catch(e) { console.error(e); }
+	e = e.replace(/\n/g," ");
+	e = e.replace(/console\.log/g,"consolelog");
+	e = e.replace(/console\.clear/g,"clearoutput");
+	try {
+		var before = new Date();
+		var res = eval(e);
+		if(res) consolelog(res);
+		var after = new Date();
+		if(document.getElementById("time").checked)
+			consolelog(after-before+"ms");
+	} catch(e){ console.error(e); }
+}
+
+function consolelog(...args){
+	var o = document.getElementById("output");
+	for(var arg of args){
+		console.log(arg);
+		if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
+		else o.value += arg+"\n";
+	}
+}
 		</script>
 		<link rel="icon" type="image/ico" href="./assets/favicon.ico"/>
 		<link rel="manifest" href="./manifest.webmanifest">
