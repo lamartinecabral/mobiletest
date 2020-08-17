@@ -16,13 +16,14 @@ function run(){
 	} catch(e){ console.error(e); }
 }
 
-function consolelog(...args){
+function consolelog(){
 	var o = document.getElementById("output");
-	for(var arg of args){
+	for(var i=0; i<arguments.length; i++){
+		var arg = arguments[i];
 		console.log(arg);
 		if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
 		else o.value += arg+"\n";
-	}
+	};
 }
 
 function cleareval(){
@@ -35,11 +36,13 @@ function clearoutput(){
 
 function identation(ev){
 	if(ev.keyCode === 13){
-		var {value, selectionStart} = ev.target;
+		var value = ev.target.value;
+		var selectionStart = ev.target.selectionStart;
 		value = [value.slice(0,selectionStart), value.slice(selectionStart)];
 		var lines = value[0].split("\n");
 		if(lines.length < 2) return;
-		for(var c of lines[lines.length-2]){
+		for(var i=0; i<lines[lines.length-2].length; i++){
+			var c = lines[lines.length-2][i];
 			if(c != " " && c != "\t") break;
 			lines[lines.length-1] = c + lines[lines.length-1];
 			selectionStart++;
@@ -54,7 +57,8 @@ function identation(ev){
 function tabinput(ev){
 	if(ev.keyCode === 9){
 		ev.preventDefault();
-		var {value, selectionStart} = ev.target;
+		var value = ev.target.value;
+		var selectionStart = ev.target.selectionStart
 		value = [value.slice(0,selectionStart), value.slice(selectionStart)];
 		value[0] += "  ";
 		selectionStart += 2;
@@ -74,6 +78,11 @@ try {
 	console.log('moment()', moment());
 } catch(e){ console.error(e); }
 
-try {
-	document.getElementById("eval").value = localStorage.getItem("eval");
-} catch(e){ console.error(e); }
+function initEval(first){
+	if(!localStorage) return;
+	try {
+		if(!localStorage.getItem("eval") && first) setTimeout(function(){initEval(false);},1000);
+		else document.getElementById("eval").value = localStorage.getItem("eval");
+	} catch(e){ console.error(e); }
+}
+initEval(true);

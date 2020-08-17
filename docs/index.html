@@ -2,49 +2,6 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
 		<!-- <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js', {scope: '/'}); };</script> -->
-		<script>
-alert("start8");
-function run(){
-	var e = document.getElementById("eval").value;
-	try {
-		localStorage.setItem("eval", e);
-	} catch(e) { console.error(e); }
-	e = e.replace(/\n/g," ");
-	e = e.replace(/console\.log/g,"consolelog");
-	e = e.replace(/console\.clear/g,"clearoutput");
-	try {
-		var before = new Date();
-		var res = eval(e);
-		if(res) consolelog(res);
-		var after = new Date();
-		if(document.getElementById("time").checked)
-			consolelog(after-before+"ms");
-	} catch(e){ console.error(e); }
-}
-function consolelog(arg){
-	var o = document.getElementById("output");
-// 	arguments.forEach(function(arg){
-		console.log(arg);
-		if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
-		else o.value += arg+"\n";
-// 	});
-}
-function clearoutput(){
-	document.getElementById("output").value = "";
-}
-// function initEval(first){
-// 	try {
-// 		if(!localStorage.getItem("eval") && first) else setTimeout(function(){initEval(false)},1000);
-// 		else document.getElementById("eval").value = localStorage.getItem("eval");
-// 	} catch(e){ console.error(e); }
-// }
-// initEval(true);
-try {
-// 	if(!localStorage.getItem("eval") && first) else setTimeout(function(){initEval(false)},1000);
-// 	else 
-		document.getElementById("eval").value = localStorage.getItem("eval");
-} catch(e){ console.error(e); }
-		</script>
 		<link rel="icon" type="image/ico" href="./assets/favicon.ico"/>
 		<link rel="manifest" href="./manifest.webmanifest">
 		<link rel="stylesheet" type="text/css" href="./style.css">
@@ -74,8 +31,8 @@ try {
 			
 		</div>
 	</body>
-	<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/eruda"></script> -->
-	<!-- <script type="text/javascript" src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script> -->
-	<!-- <script type="text/javascript" src="https://momentjs.com/downloads/moment-with-locales.min.js"></script> -->
-	<!-- <script type="text/javascript" src="./main.js"></script> -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/eruda"></script>
+	<script type="text/javascript" src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+	<script type="text/javascript" src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+	<script type="text/javascript" src="./main.js"></script>
 </html>
