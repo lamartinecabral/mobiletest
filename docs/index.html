@@ -3,7 +3,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
 		<!-- <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js', {scope: '/'}); };</script> -->
 		<script>
-alert("start6");
+alert("start7");
 function run(){
 	var e = document.getElementById("eval").value;
 	try {
@@ -21,13 +21,13 @@ function run(){
 			consolelog(after-before+"ms");
 	} catch(e){ console.error(e); }
 }
-function consolelog(arg){
+function consolelog(){
 	var o = document.getElementById("output");
-// 	for(var arg of arguments){
+	arguments.forEach(function(arg){
 		console.log(arg);
 		if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
 		else o.value += arg+"\n";
-// 	}
+	});
 }
 function clearoutput(){
 	document.getElementById("output").value = "";
