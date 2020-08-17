@@ -10,7 +10,7 @@
 		<div class="center">
 			
 			<label for="eval">eval</label><br>
-			<textarea name="eval" id="eval" cols="42" rows="20" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea><br>
+			<textarea name="eval" id="eval" cols="42" rows="20" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeyup="identation(event)" onkeydown="tabinput(event)"></textarea><br>
 			<button onclick="run()">run</button>
 			<div style="display: inline; display: inline-flex; align-items: center;">
 				<input type="checkbox" id="time" name="time">
@@ -36,9 +36,13 @@
 	<!-- <script type="text/javascript" src="https://momentjs.com/downloads/moment-with-locales.min.js"></script> -->
 	<!-- <script type="text/javascript" src="./main.js"></script> -->
 	<script>
-alert("script started");
+
+alert("begin");
 function run(){
 	var e = document.getElementById("eval").value;
+	try {
+		localStorage.setItem("eval", e);
+	} catch(e) { console.error(e); }
 	e = e.replace(/\n/g," ");
 	e = e.replace(/console\.log/g,"consolelog");
 	e = e.replace(/console\.clear/g,"clearoutput");
@@ -100,7 +104,19 @@ function tabinput(ev){
 	}
 }
 
-document.getElementById("eval").onkeyup = identation;
-document.getElementById("eval").onkeydown = tabinput;	
+try {
+	console.log('eruda', eruda, eruda.init() );
+} catch(e){ console.error(e); }
+try {
+	console.log('rxjs', rxjs);
+} catch(e){ console.error(e); }
+try {
+	console.log('moment()', moment());
+} catch(e){ console.error(e); }
+
+try {
+	document.getElementById("eval").value = localStorage.getItem("eval");
+} catch(e){ console.error(e); }
+
 	</script>
 </html>
