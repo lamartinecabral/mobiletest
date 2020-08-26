@@ -18,6 +18,7 @@ var static = [
 var notstatic = [
 	// './index.html',
 	'./main.js',
+	'./utils.js',
 	'./manifest.webmanifest',
 	'./style.css',
 	'./sw.js',
