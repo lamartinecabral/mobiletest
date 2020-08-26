@@ -394,31 +394,11 @@ function random_shuffle(v) {
         _a = [v[j], v[i]], v[i] = _a[0], v[j] = _a[1];
     }
 }
-function testdiv(n) {
-    console.clear();
-    if (!n)
-        n = 1e14 + 1;
-    var cont = [];
-    for (var i = 1; i * i <= n; i++) {
-        if (n % i == 0) {
-            cont.push(i);
-            cont.push(n / i);
-        }
-    }
-    cont = cont.sort(function (a, b) { return a - b; });
-    console.log(cont);
+function testdiv() {
+    document.getElementById("eval").value =
+        "console.clear();\nlet n = 1e14 + 1;\nvar cont = [];\nfor (var i = 1; i * i <= n; i++) {\n  if (n % i == 0) {\n    cont.push(i);\n    cont.push(n / i);\n  }\n}\ncont = cont.sort(function (a, b) { return a - b; });\nconsole.log(cont);";
 }
-function testpi(n) {
-    console.clear();
-    if (!n)
-        n = 1e7;
-    var cont = 0;
-    for (var i = 1; i <= n; i++) {
-        var x = Math.random();
-        var y = Math.random();
-        if (x * x + y * y <= 1)
-            cont++;
-    }
-    console.log(4 * cont / n);
-    console.log(Math.PI);
+function testpi() {
+    document.getElementById("eval").value =
+        "console.clear();\nlet n = 1e7;\nvar cont = 0;\nfor (var i = 1; i <= n; i++) {\n  var x = Math.random();\n  var y = Math.random();\n  if (x * x + y * y <= 1)\n    cont++;\n}\nconsole.log(4 * cont / n);\nconsole.log(Math.PI);";
 }
