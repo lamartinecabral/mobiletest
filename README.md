@@ -10,7 +10,7 @@ I also included a implementation of a self-balancing binary search tree. Current
 Usage example:
 ```javascript
 // comparator function is optional
-let t = new Bbt((a,b)=>a-b);
+let t = new Treap((a,b)=>a-b);
 // pair key,value. value is optional
 for(let key of [4,7,6,2,3]) t.add(key,null);
 // array with all nodes of the tree
@@ -33,4 +33,7 @@ t.inOrder(console.log);
 // example of traversal from last to first
 for(let i = t.kth(t.size()); i; i = t.prev(i))
   console.log( t.get(i) );
+// scan all nodes looking for an error
+let err = t.checkConsistence();
+if(err) console.log(err);
 ```
