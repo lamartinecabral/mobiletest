@@ -1,5 +1,5 @@
-var Bbt = /** @class */ (function () {
-    function Bbt(comparator) {
+var Treap = /** @class */ (function () {
+    function Treap(comparator) {
         this.tree = [null];
         this.freeIndexes = [];
         if (comparator)
@@ -7,31 +7,27 @@ var Bbt = /** @class */ (function () {
         else
             this.comp = function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); };
     }
-    Bbt.prototype.newPointer = function () {
+    Treap.prototype.newPointer = function () {
         if (this.freeIndexes.length)
             return this.freeIndexes.pop();
         this.tree.push(undefined);
         return this.tree.length - 1;
     };
-    Bbt.prototype.free = function (node) {
-        this.freeIndexes.push(node);
-        delete this.tree[node];
-    };
     /**
-     * returns the quantity of nodes in the tree
+     * returns the quantity of node in the tree
      * O(1)
     */
-    Bbt.prototype.size = function () { return this.root ? this.tree[this.root].s : 0; };
+    Treap.prototype.size = function () { return !(this.root) ? 0 : this.tree[this.root].s; };
     /**
      * returns an object with key and value of the node from the given reference
      * O(1)
     */
-    Bbt.prototype.get = function (pointer) { return { key: this.tree[pointer].k, value: this.tree[pointer].v }; };
+    Treap.prototype.get = function (pointer) { return { key: this.tree[pointer].k, value: this.tree[pointer].v }; };
     /**
      * returns a reference for the node with the given key
      * O(log)
     */
-    Bbt.prototype.find = function (key) {
+    Treap.prototype.find = function (key) {
         if (key === undefined || key === null)
             return undefined;
         var node = this.root;
@@ -44,12 +40,196 @@ var Bbt = /** @class */ (function () {
         return node;
     };
     /**
+     * deletes the node of the given reference
+     * O(log)
+    */
+    Treap.prototype.remove = function (node) {
+        if (!this.tree[node])
+            return false;
+        while (this.tree[node].l && this.tree[node].r) {
+            if (this.tree[this.tree[node].l].h > this.tree[this.tree[node].r].h) {
+                node = this.tree[node].l;
+                this.rotateR(node);
+            }
+            else {
+                node = this.tree[node].r;
+                this.rotateL(node);
+            }
+        }
+        if (this.tree[node].l || this.tree[node].r) {
+            var parent_1 = this.tree[node].p;
+            var child = this.tree[node].l || this.tree[node].r;
+            this.tree[child].p = parent_1;
+            if (parent_1) {
+                if (this.comp(this.tree[child].k, this.tree[parent_1].k) > 0)
+                    this.tree[parent_1].r = child;
+                else
+                    this.tree[parent_1].l = child;
+            }
+            else {
+                this.root = child;
+            }
+        }
+        if (this.tree[node].p) {
+            if (this.tree[this.tree[node].p].l === node)
+                this.tree[this.tree[node].p].l = undefined;
+            else if (this.tree[this.tree[node].p].r === node)
+                this.tree[this.tree[node].p].r = undefined;
+            this.updateSize(this.tree[node].p, true);
+        }
+        delete this.tree[node];
+        this.freeIndexes.push(node);
+        return true;
+    };
+    /**
+     * adds a node in the tree with the given key and value and returns the reference of the new node
+     * O(log)
+    */
+    Treap.prototype.add = function (k, v, h) {
+        var novo = this.newPointer();
+        this.tree[novo] = {
+            k: k,
+            h: h ? h : Math.random(),
+            v: v,
+            s: 1
+        };
+        if (!(this.root))
+            return this.root = novo;
+        var node = this.root;
+        while (true) {
+            if (this.comp(this.tree[node].k, this.tree[novo].k) == 0)
+                return this.remove(novo), undefined;
+            if (this.comp(this.tree[node].k, this.tree[novo].k) > 0) {
+                if (this.tree[node].l) {
+                    node = this.tree[node].l;
+                    continue;
+                }
+                this.tree[node].l = novo;
+                this.tree[novo].p = node;
+                return this.balance(novo);
+            }
+            else {
+                if (this.tree[node].r) {
+                    node = this.tree[node].r;
+                    continue;
+                }
+                this.tree[node].r = novo;
+                this.tree[novo].p = node;
+                return this.balance(novo);
+            }
+        }
+    };
+    Treap.prototype.smaller = function (node) {
+        while (this.tree[node].l)
+            node = this.tree[node].l;
+        return node;
+    };
+    Treap.prototype.greater = function (node) {
+        while (this.tree[node].r)
+            node = this.tree[node].r;
+        return node;
+    };
+    /**
+     * return reference for the next node in a in order traversal of the tree
+     * O(1) amortized
+    */
+    Treap.prototype.next = function (node) {
+        if (this.tree[node].r)
+            return this.smaller(this.tree[node].r);
+        while (this.tree[node].p && node == this.tree[this.tree[node].p].r)
+            node = this.tree[node].p;
+        if (this.tree[node].p)
+            return this.tree[node].p;
+        return undefined;
+    };
+    /**
+     * return reference for the previous node in a in order traversal of the tree
+     * O(1) amortized
+    */
+    Treap.prototype.prev = function (node) {
+        if (this.tree[node].l)
+            return this.greater(this.tree[node].l);
+        while (this.tree[node].p && node == this.tree[this.tree[node].p].l)
+            node = this.tree[node].p;
+        if (this.tree[node].p)
+            return this.tree[node].p;
+        return undefined;
+    };
+    Treap.prototype.balance = function (node) {
+        while (this.tree[node].p) {
+            if (this.tree[node].h < this.tree[this.tree[node].p].h)
+                break;
+            if (this.comp(this.tree[node].k, this.tree[this.tree[node].p].k) > 0)
+                this.rotateL(node);
+            else
+                this.rotateR(node);
+            this.updateSize(node);
+            node = this.tree[node].p;
+            this.updateSize(node);
+        }
+        if (this.tree[node].p)
+            this.updateSize(this.tree[node].p, true);
+        return node;
+    };
+    Treap.prototype.rotateR = function (node) {
+        var _a, _b;
+        var b = node;
+        var d = this.tree[b].p;
+        var a = this.tree[b].l;
+        var c = this.tree[b].r;
+        var e = this.tree[d].r;
+        _a = [this.tree[d], this.tree[b]], this.tree[b] = _a[0], this.tree[d] = _a[1];
+        _b = [d, b], b = _b[0], d = _b[1];
+        if (a)
+            this.tree[a].p = b;
+        if (c)
+            this.tree[c].p = d;
+        if (e)
+            this.tree[e].p = d;
+        this.tree[b].p = this.tree[d].p;
+        this.tree[d].p = b;
+        this.tree[d].l = c;
+        this.tree[b].r = d;
+        if (!this.tree[b].p)
+            this.root = b;
+    };
+    Treap.prototype.rotateL = function (node) {
+        var _a, _b;
+        var d = node;
+        var b = this.tree[d].p;
+        var a = this.tree[b].l;
+        var c = this.tree[d].l;
+        var e = this.tree[d].r;
+        _a = [this.tree[d], this.tree[b]], this.tree[b] = _a[0], this.tree[d] = _a[1];
+        _b = [d, b], b = _b[0], d = _b[1];
+        if (a)
+            this.tree[a].p = b;
+        if (c)
+            this.tree[c].p = b;
+        if (e)
+            this.tree[e].p = d;
+        this.tree[d].p = this.tree[b].p;
+        this.tree[b].p = d;
+        this.tree[d].l = b;
+        this.tree[b].r = c;
+        if (!this.tree[d].p)
+            this.root = d;
+    };
+    Treap.prototype.updateSize = function (node, toRoot) {
+        if (toRoot === void 0) { toRoot = false; }
+        do {
+            this.tree[node].s =
+                (this.tree[node].l ? this.tree[this.tree[node].l].s : 0) +
+                    (this.tree[node].r ? this.tree[this.tree[node].r].s : 0) + 1;
+        } while (toRoot && (node = this.tree[node].p));
+    };
+    /**
      * returns a reference for the node with the kth greater key
      * O(log)
     */
-    Bbt.prototype.kth = function (i) {
+    Treap.prototype.kth = function (i) {
         if (!i)
-            return undefined;
+            return i;
         i = +i;
         var node = this.root;
         while (node) {
@@ -72,7 +252,7 @@ var Bbt = /** @class */ (function () {
      * returns how many nodes has key smaller than or equal to the given key
      * O(log)
     */
-    Bbt.prototype.order = function (key) {
+    Treap.prototype.order = function (key) {
         if (key === undefined || key === null)
             return undefined;
         var node = this.root;
@@ -96,7 +276,7 @@ var Bbt = /** @class */ (function () {
      * in order traversal the tree calling the given function for every node, passing two parameters: the key and the value of the node
      * O(n)
     */
-    Bbt.prototype.inOrder = function (callback) {
+    Treap.prototype.inOrder = function (callback) {
         var s = [];
         if (this.root)
             s.push(this.root);
@@ -114,243 +294,64 @@ var Bbt = /** @class */ (function () {
             }
         }
     };
-    Bbt.prototype.smaller = function (node) {
-        while (this.tree[node].l)
-            node = this.tree[node].l;
-        return node;
-    };
-    Bbt.prototype.greater = function (node) {
-        while (this.tree[node].r)
-            node = this.tree[node].r;
-        return node;
-    };
-    /**
-     * return reference for the next node in a in order traversal of the tree
-     * O(1) amortized
-    */
-    Bbt.prototype.next = function (node) {
-        if (this.tree[node].r)
-            return this.smaller(this.tree[node].r);
-        while (this.tree[node].p && node == this.tree[this.tree[node].p].r)
-            node = this.tree[node].p;
-        if (this.tree[node].p)
-            return this.tree[node].p;
-        return undefined;
-    };
-    /**
-     * return reference for the previous node in a in order traversal of the tree
-     * O(1) amortized
-    */
-    Bbt.prototype.prev = function (node) {
-        if (this.tree[node].l)
-            return this.greater(this.tree[node].l);
-        while (this.tree[node].p && node == this.tree[this.tree[node].p].l)
-            node = this.tree[node].p;
-        if (this.tree[node].p)
-            return this.tree[node].p;
-        return undefined;
-    };
-    /**
-     * deletes the node of the given reference
-     * O(log)
-    */
-    Bbt.prototype.remove = function (node) {
-        var _a, _b, _c, _d;
-        var d = node;
-        var b = this.tree[d].l;
-        var a = b ? this.tree[b].l : b;
-        var c = b ? this.tree[b].r : b;
-        var f = this.tree[d].r;
-        var e = f ? this.tree[f].l : f;
-        var g = f ? this.tree[f].r : f;
-        if (b && f) {
-            if (!c) {
-                this.tree[f].l = b;
-                this.tree[f].p = this.tree[d].p;
-                this.tree[g].p = d;
-                _a = [this.tree[d], this.tree[f]], this.tree[f] = _a[0], this.tree[d] = _a[1];
-                delete this.tree[f];
-                this.freeIndexes.push(f);
-                if (e)
-                    this.tree[e].p = b;
-                this.tree[b].r = e;
-                this.updateSize(b);
-            }
-            else {
-                var F = this.smaller(f);
-                this.tree[b].r = f;
-                this.tree[b].p = this.tree[d].p;
-                this.tree[a].p = d;
-                _b = [this.tree[d], this.tree[b]], this.tree[b] = _b[0], this.tree[d] = _b[1];
-                delete this.tree[b];
-                this.freeIndexes.push(b);
-                if (c)
-                    this.tree[c].p = F;
-                this.tree[F].l = c;
-                this.updateSize(F);
-            }
-        }
-        else if (b) {
-            if (a)
-                this.tree[a].p = d;
-            this.tree[d].l = a;
-            if (c)
-                this.tree[c].p = d;
-            this.tree[d].r = c;
-            _c = [this.tree[d], this.tree[b]], this.tree[b] = _c[0], this.tree[d] = _c[1];
-            delete this.tree[b];
-            this.freeIndexes.push(b);
-            if (this.tree[d].p)
-                this.updateSize(this.tree[d].p);
-        }
-        else if (f) {
-            if (e)
-                this.tree[e].p = d;
-            this.tree[d].l = e;
-            if (g)
-                this.tree[g].p = d;
-            this.tree[d].r = g;
-            _d = [this.tree[d], this.tree[b]], this.tree[b] = _d[0], this.tree[d] = _d[1];
-            delete this.tree[b];
-            this.freeIndexes.push(b);
-            if (this.tree[d].p)
-                this.updateSize(this.tree[d].p);
-        }
-        else {
-            var D = this.tree[d].p;
-            if (D) {
-                if (this.tree[D].l == d)
-                    this.tree[D].l = undefined;
-                else
-                    this.tree[D].r = undefined;
-                this.updateSize(D);
-            }
-            else
-                this.root = undefined;
-            delete this.tree[d];
-            this.freeIndexes.push(d);
-        }
-    };
-    /**
-     * adds a node in the tree with the given key and value and returns the reference of the new node
-     * O(log)
-    */
-    Bbt.prototype.add = function (k, v, h) {
-        var novo = this.newPointer();
-        this.tree[novo] = {
-            k: k,
-            v: v,
-            s: 1
-        };
+    Treap.prototype.checkConsistence = function () {
         if (!this.root)
-            return this.root = novo;
-        var node = this.root;
-        while (true) {
-            if (this.comp(this.tree[node].k, k) == 0)
-                return this.free(node), undefined;
-            if (this.comp(this.tree[node].k, k) > 0) {
-                if (this.tree[node].l)
-                    node = this.tree[node].l;
-                else {
-                    this.tree[node].l = novo;
-                    break;
-                }
+            return "no nodes";
+        if (this.tree[this.root].p)
+            return "root has parent";
+        for (var node = 1; node < this.tree.length; node++) {
+            if (!this.tree[node])
+                continue;
+            for (var _i = 0, _a = ["p", "l", "r", "s"]; _i < _a.length; _i++) {
+                var x = _a[_i];
+                if (this.tree[node][x] && typeof (this.tree[node][x]) != 'number')
+                    return "invalid pointer";
+            }
+            if (!this.tree[node].p) {
+                if (node != this.root)
+                    return "node without parent";
             }
             else {
-                if (this.tree[node].r)
-                    node = this.tree[node].r;
+                if (this.comp(this.tree[this.tree[node].p].k, this.tree[node].k) > 0) {
+                    if (this.tree[this.tree[node].p].l != node)
+                        return "pointer error";
+                }
                 else {
-                    this.tree[node].r = novo;
-                    break;
+                    if (this.tree[this.tree[node].p].r != node)
+                        return "pointer error";
                 }
             }
-        }
-        this.tree[novo].p = node;
-        return this.updateSize(node);
-    };
-    Bbt.prototype.updateSize = function (node) {
-        var balance;
-        do {
+            if (this.tree[node].l && this.tree[this.tree[node].l].p != node)
+                return "pointer error";
+            if (this.tree[node].r && this.tree[this.tree[node].r].p != node)
+                return "pointer error";
             var lsize = (this.tree[node].l ? this.tree[this.tree[node].l].s : 0);
             var rsize = (this.tree[node].r ? this.tree[this.tree[node].r].s : 0);
-            this.tree[node].s = lsize + rsize + 1;
-            if (lsize + rsize > 1 && (lsize > rsize ? lsize : rsize) > 2 * (lsize < rsize ? lsize : rsize))
-                balance = node;
-        } while (node = this.tree[node].p);
-        return balance ? this.rebalance(balance) : node;
-    };
-    Bbt.prototype.rebalance = function (node) {
-        var last = this.greater(node);
-        var nodes = [];
-        for (var i = this.smaller(node); true; i = this.next(i)) {
-            nodes.push(i);
-            if (i == last)
-                break;
+            if (this.tree[node].s != 1 + lsize + rsize)
+                return "wrong size";
+            if (this.tree[node].p && this.tree[this.tree[node].p].h < this.tree[node].h)
+                return "heap error";
         }
-        var parent = this.tree[node].p;
-        node = nodes[nodes.length - 1 >> 1];
-        if (parent) {
-            if (this.comp(this.tree[parent].k, this.tree[node].k) > 0)
-                this.tree[parent].l = node;
-            else
-                this.tree[parent].r = node;
-        }
-        else
-            this.root = node;
-        this.tree[node].p = parent;
-        this.tree[node].l = this.tree[node].r = undefined;
-        this.tree[node].s = 1;
-        var s = [];
-        if (nodes.length > 1)
-            s.push([0, nodes.length - 1]);
-        while (s.length) {
-            var i = s.pop();
-            if (typeof i == "number") {
-                if (this.tree[i].l)
-                    this.tree[i].s += this.tree[this.tree[i].l].s;
-                if (this.tree[i].r)
-                    this.tree[i].s += this.tree[this.tree[i].r].s;
-                continue;
-            }
-            var mid = (i[0] + i[1]) >> 1;
-            if (i[0] < i[1])
-                s.push(nodes[mid]);
-            if (mid > i[0]) {
-                var midl = (i[0] + mid - 1) >> 1;
-                this.tree[nodes[mid]].l = nodes[midl];
-                this.tree[nodes[midl]].p = nodes[mid];
-                this.tree[nodes[midl]].s = 1;
-                this.tree[nodes[midl]].l = this.tree[nodes[midl]].r = undefined;
-                if (i[0] != mid - 1)
-                    s.push([i[0], mid - 1]);
-            }
-            if (mid < i[1]) {
-                var midr = (mid + 1 + i[1]) >> 1;
-                this.tree[nodes[mid]].r = nodes[midr];
-                this.tree[nodes[midr]].p = nodes[mid];
-                this.tree[nodes[midr]].s = 1;
-                this.tree[nodes[midr]].l = this.tree[nodes[midr]].r = undefined;
-                if (i[1] != mid + 1)
-                    s.push([mid + 1, i[1]]);
-            }
-        }
-        return node;
+        return "";
     };
     /**
      * returns an array with all the nodes with details about the structure of the tree
     */
-    Bbt.prototype.prettify = function () {
+    Treap.prototype.prettify = function () {
         var _this = this;
-        return this.tree.filter(function (x) { return x; }).map(function (x) {
+        var nodes = [this.tree[this.root]];
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].l)
+                nodes.push(this.tree[nodes[i].l]);
+            if (nodes[i].r)
+                nodes.push(this.tree[nodes[i].r]);
+        }
+        return nodes.filter(function (x) { return x; }).map(function (x) {
             try {
                 return {
                     key: x.k,
-                    size: x.s,
-                    parent: x.p ? _this.tree[x.p].k : '',
-                    lsize: x.l ? _this.tree[x.l].s : '',
-                    rsize: x.r ? _this.tree[x.r].s : '',
-                    left: x.l ? _this.tree[x.l].k : '',
-                    right: x.r ? _this.tree[x.r].k : ''
+                    // size: x.s,
+                    parentkey: x.p ? _this.tree[x.p].k : 0
                 };
             }
             catch (e) {
@@ -362,7 +363,7 @@ var Bbt = /** @class */ (function () {
      * returns the height of the tree
      * O(n)
     */
-    Bbt.prototype.heigth = function () {
+    Treap.prototype.heigth = function () {
         var ret = {};
         var s = [this.root];
         while (s.length) {
@@ -385,7 +386,7 @@ var Bbt = /** @class */ (function () {
         }
         return ret[this.root];
     };
-    return Bbt;
+    return Treap;
 }());
 function random_shuffle(v) {
     var _a;
@@ -396,9 +397,13 @@ function random_shuffle(v) {
 }
 function testdiv() {
     document.getElementById("eval").value =
-        "console.clear();\nlet n = 1e14 + 1;\nvar cont = [];\nfor (var i = 1; i * i <= n; i++) {\n  if (n % i == 0) {\n    cont.push(i);\n    cont.push(n / i);\n  }\n}\ncont = cont.sort(function (a, b) { return a - b; });\nconsole.log(cont);";
+        "console.clear();\nlet n = 1e14 + 1;\nlet cont = [];\nfor (let i = 1; i * i <= n; i++) {\n  if (n % i == 0) {\n    cont.push(i);\n    cont.push(n / i);\n  }\n}\ncont = cont.sort(function (a, b) { return a - b; });\nconsole.log(cont);";
 }
 function testpi() {
     document.getElementById("eval").value =
-        "console.clear();\nlet n = 1e7;\nvar cont = 0;\nfor (var i = 1; i <= n; i++) {\n  var x = Math.random();\n  var y = Math.random();\n  if (x * x + y * y <= 1)\n    cont++;\n}\nconsole.log(4 * cont / n);\nconsole.log(Math.PI);";
+        "console.clear();\nlet n = 1e7;\nlet cont = 0;\nfor (let i = 1; i <= n; i++) {\n  let x = Math.random();\n  let y = Math.random();\n  if (x * x + y * y <= 1)\n    cont++;\n}\nconsole.log(4 * cont / n);\nconsole.log(Math.PI);";
+}
+function testtreap(){
+    document.getElementById("eval").value =
+        "console.clear();\nlet t = new Treap();\nlet n = 2e4;\nfor(let i=1; i<=n; i++){\n  let key = Math.random()*n*10>>0;\n  let node = t.find(key);\n  if(node) t.remove(node);\n  else t.add(key);\n  if(i%(n/10) == 0){\n    let err = t.checkConsistence();\n    if(err){\n      console.log(i, err);\n      break;\n    }\n  }\n}";
 }

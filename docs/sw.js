@@ -1,5 +1,5 @@
 // use a cacheName for cache versioning
-var cacheName = 'v20200825.1';
+var cacheName = 'v20200826.13';
 
 var static = [
 	'https://cdn.jsdelivr.net/npm/eruda',
@@ -34,6 +34,7 @@ self.addEventListener('activate', function(e) {
 
 // during the install phase you usually want to cache static assets
 self.addEventListener('install', function(e) {
+	self.skipWaiting();
 	// once the SW is installed, go ahead and fetch the resources to make this work offline
 	console.log("install", {e});
 	e.waitUntil(
@@ -49,23 +50,37 @@ self.addEventListener('install', function(e) {
 // when the browser fetches a url
 self.addEventListener('fetch', function(event) {
 	// either respond with the cached object or go ahead and fetch the actual url
-	event.respondWith(
-		caches.match(event.request).then(function(response) {
+	let getFromCache = function(){
+		return caches.match(event.request).then(function(response) {
 			if (response) {
 				// retrieve from cache
 				console.log("fetch matched", event.request.url, {event,response});
-				if(shouldUpdate(event.request.url)) event.waitUntil(
-					caches.open(cacheName).then(function (cache) {
-						return cache.add(event.request);
-					})
-				);
 				return response;
 			}
 			// fetch as normal
 			console.log("fetch not matched", event.request.url, {event});
 			return fetch(event.request);
+		});
+	};
+	
+	if(shouldUpdate(event.request.url)) event.respondWith(
+		fetch(event.request).then(function(response){
+			if(response.status == 200){
+				event.waitUntil(
+					caches.open(cacheName).then(function (cache) {
+						return cache.put(event.request, response).catch(function(e){});
+					})
+				);
+				console.log("fetched", event.request.url, {event,response});
+				return response;
+			} else {
+				return getFromCache();
+			}
+		}).catch(function(){
+			return getFromCache();
 		})
 	);
+	else event.respondWith( getFromCache() );
 });
 
 function shouldUpdate(url){
