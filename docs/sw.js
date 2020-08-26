@@ -1,5 +1,5 @@
 // use a cacheName for cache versioning
-var cacheName = 'v20200817.8';
+var cacheName = 'v20200825.1';
 
 var static = [
 	'https://cdn.jsdelivr.net/npm/eruda',
