@@ -86,3 +86,21 @@ function initEval(first){
 	} catch(e){ console.error(e); }
 }
 initEval(true);
+
+
+installPromptEvent = null;
+window.addEventListener('beforeinstallprompt', function(e){
+	console.log('beforeinstallprompt', e);
+	e.preventDefault();
+	installPromptEvent = e;
+	document.getElementById("install-btn").style.display = "unset";
+});
+function install(){
+	document.getElementById("install-btn").style.display = 'none';
+	installPromptEvent.prompt();
+	installPromptEvent.userChoice.then(function(choice){
+		if(!choice) return console.log("whaaaat");
+		console.log("A2HS", choice.outcome)
+		installPromptEvent = null;
+	});
+}

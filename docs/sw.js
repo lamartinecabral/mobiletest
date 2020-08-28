@@ -1,18 +1,22 @@
 // use a cacheName for cache versioning
-var cacheName = 'v20200826.13';
+var cacheName = 'v20200828.2';
 
 var static = [
+	'./assets/favicon.ico',
+	'./assets/icon.png',
+	'./assets/github.svg',
 	'https://cdn.jsdelivr.net/npm/eruda',
 	// './assets/eruda.js',
 	// './assets/eruda.js.map',
-	'./assets/favicon.ico',
-	'./assets/icon.png',
 	'https://momentjs.com/downloads/moment-with-locales.min.js',
 	// './assets/moment-with-locales.min.js',
 	// './assets/moment-with-locales.min.js.map',
 	'https://unpkg.com/rxjs/bundles/rxjs.umd.min.js',
 	// './assets/rxjs.umd.min.js',
 	// './assets/rxjs.umd.min.js.map',
+	'https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js',
+	// './assets/jquery-3.5.1.min.js',
+	// './assets/jquery-3.5.1.min.map',
 ];
 
 var notstatic = [
