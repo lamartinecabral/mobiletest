@@ -96,7 +96,6 @@ window.addEventListener('beforeinstallprompt', function(e){
 	document.getElementById("install-btn").style.display = "unset";
 });
 function install(){
-	document.getElementById("install-btn").style.display = 'none';
 	installPromptEvent.prompt();
 	installPromptEvent.userChoice.then(function(choice){
 		if(!choice) return console.log("whaaaat");
