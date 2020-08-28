@@ -11,12 +11,12 @@ I also included a implementation of two self-balancing binary search tree, Treap
 Usage example:
 ```javascript
 // comparator function is optional
-let t = new Avl((a,b)=>a-b); // or new Treap()
+let t = new Avl((a,b)=>a-b); //new Treap((a,b)=>a-b);
 // pair key,value. value is optional
 for(let key of [4,7,6,2,3]) t.add(key,null);
 // array with all nodes of the tree
 console.log( t.prettify() );
-console.log( t.heigth() );
+console.log( t.height() );
 // element with key equal to 3
 console.log( t.get(t.find(3)) );
 t.remove(t.find(7));

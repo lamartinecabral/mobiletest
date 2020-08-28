@@ -5,7 +5,7 @@ function run(){
 	} catch(e) { console.error(e); }
 	e = e.split("//");
 	for(let i=1; i<e.length; i++)
-		e[i] = e[i].split("\n").slice(1).join("");
+		e[i] = e[i].split("\n").slice(1).join("\n");
 	e = e.join("");
 	e = e.replace(/\n/g," ");
 	e = e.replace(/console\.log/g,"consolelog");
