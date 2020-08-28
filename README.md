@@ -4,6 +4,7 @@ packages included:
 - [Eruda](https://eruda.liriliri.io/)
 - [RxJS](https://github.com/ReactiveX/rxjs)
 - [Moment.js](https://momentjs.com/)
+- [jQuery](https://jquery.com/)
 
 I also included a implementation of a self-balancing binary search tree. Currently in beta, so it may have bugs.
 
