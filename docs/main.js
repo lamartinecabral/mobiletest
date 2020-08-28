@@ -119,3 +119,9 @@ function toggleEruda(){
 	didErudaInit = !didErudaInit;
 	document.getElementById("eruda-btn").innerText = (didErudaInit ? "Destroy" : "Init")+" Eruda";
 }
+
+function asset(e){
+	var script = document.createElement('script');
+	script.setAttribute('src','./assets/'+e.target.src.split("/").slice(-1));
+	document.head.appendChild(script);
+}
