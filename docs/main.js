@@ -10,7 +10,6 @@ function run(){
 	e = e.replace(/\n/g," ");
 	e = e.replace(/console\.log/g,"consolelog");
 	e = e.replace(/console\.clear/g,"clearoutput");
-	console.log(e);
 	try {
 		var before = new Date();
 		var res = eval(e);

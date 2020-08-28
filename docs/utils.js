@@ -1,5 +1,18 @@
-var Avl = /** @class */ (function () {
-    function Avl(comparator) {
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var BST = /** @class */ (function () {
+    function BST(comparator) {
         this.tree = [null];
         this.freeIndexes = [];
         if (comparator)
@@ -7,13 +20,13 @@ var Avl = /** @class */ (function () {
         else
             this.comp = function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); };
     }
-    Avl.prototype.newPointer = function () {
+    BST.prototype.newPointer = function () {
         if (this.freeIndexes.length)
             return this.freeIndexes.pop();
         this.tree.push(undefined);
         return this.tree.length - 1;
     };
-    Avl.prototype.free = function (node) {
+    BST.prototype.free = function (node) {
         this.freeIndexes.push(node);
         delete this.tree[node];
     };
@@ -21,17 +34,17 @@ var Avl = /** @class */ (function () {
      * returns the quantity of node in the tree
      * O(1)
     */
-    Avl.prototype.size = function () { return !(this.root) ? 0 : this.tree[this.root].s; };
+    BST.prototype.size = function () { return !(this.root) ? 0 : this.tree[this.root].s; };
     /**
      * returns an object with key and value of the node from the given reference
      * O(1)
     */
-    Avl.prototype.get = function (pointer) { return { key: this.tree[pointer].k, value: this.tree[pointer].v }; };
+    BST.prototype.get = function (pointer) { return { key: this.tree[pointer].k, value: this.tree[pointer].v }; };
     /**
      * returns a reference for the node with the given key
      * O(log)
     */
-    Avl.prototype.find = function (key) {
+    BST.prototype.find = function (key) {
         if (key === undefined || key === null)
             return undefined;
         var node = this.root;
@@ -43,14 +56,14 @@ var Avl = /** @class */ (function () {
         }
         return node;
     };
-    Avl.prototype.smaller = function (node) {
+    BST.prototype.smaller = function (node) {
         if (!node || !this.tree[node])
             return undefined;
         while (this.tree[node].l)
             node = this.tree[node].l;
         return node;
     };
-    Avl.prototype.greater = function (node) {
+    BST.prototype.greater = function (node) {
         if (!node || !this.tree[node])
             return undefined;
         while (this.tree[node].r)
@@ -61,7 +74,7 @@ var Avl = /** @class */ (function () {
      * return reference for the next node in a in order traversal of the tree
      * O(1) amortized
     */
-    Avl.prototype.next = function (node) {
+    BST.prototype.next = function (node) {
         if (this.tree[node].r)
             return this.smaller(this.tree[node].r);
         while (this.tree[node].p && node == this.tree[this.tree[node].p].r)
@@ -74,7 +87,7 @@ var Avl = /** @class */ (function () {
      * return reference for the previous node in a in order traversal of the tree
      * O(1) amortized
     */
-    Avl.prototype.prev = function (node) {
+    BST.prototype.prev = function (node) {
         if (this.tree[node].l)
             return this.greater(this.tree[node].l);
         while (this.tree[node].p && node == this.tree[this.tree[node].p].l)
@@ -83,6 +96,109 @@ var Avl = /** @class */ (function () {
             return this.tree[node].p;
         return undefined;
     };
+    /**
+     * returns a reference for the node with the kth greater key
+     * O(log)
+    */
+    BST.prototype.kth = function (i) {
+        if (!i)
+            return i;
+        i = +i;
+        var node = this.root;
+        while (node) {
+            if (i > this.tree[node].s)
+                return undefined;
+            var esq = (!this.tree[node].l ? 1 : this.tree[this.tree[node].l].s + 1);
+            if (i === esq)
+                return node;
+            if (i > esq) {
+                i -= esq;
+                node = this.tree[node].r;
+            }
+            else {
+                node = this.tree[node].l;
+            }
+        }
+        return console.error("nao devia chegar aqui");
+    };
+    /**
+     * returns how many nodes has key smaller than or equal to the given key
+     * O(log)
+    */
+    BST.prototype.order = function (key) {
+        if (key === undefined || key === null)
+            return undefined;
+        var node = this.root;
+        var i = 0;
+        while (node) {
+            var esq = 1 + (this.tree[node].l ? this.tree[this.tree[node].l].s : 0);
+            if (this.comp(key, this.tree[node].k) == 0) {
+                return i + esq;
+            }
+            else if (this.comp(key, this.tree[node].k) > 0) {
+                i += esq;
+                node = this.tree[node].r;
+            }
+            else {
+                node = this.tree[node].l;
+            }
+        }
+        return i;
+    };
+    /**
+     * in order traversal the tree calling the given function for every node, passing two parameters: the key and the value of the node
+     * O(n)
+    */
+    BST.prototype.inOrder = function (callback) {
+        var s = [];
+        if (this.root)
+            s.push(this.root);
+        while (s.length) {
+            var top_1 = s.pop();
+            if (top_1 < 0) {
+                callback(this.tree[-top_1].k, this.tree[-top_1].v);
+            }
+            else {
+                if (this.tree[top_1].r)
+                    s.push(this.tree[top_1].r);
+                s.push(-top_1);
+                if (this.tree[top_1].l)
+                    s.push(this.tree[top_1].l);
+            }
+        }
+    };
+    /**
+     * returns an array with all the nodes with details about the structure of the tree
+    */
+    BST.prototype.prettify = function () {
+        var _this = this;
+        var nodes = [this.tree[this.root]];
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].l)
+                nodes.push(this.tree[nodes[i].l]);
+            if (nodes[i].r)
+                nodes.push(this.tree[nodes[i].r]);
+        }
+        return nodes.filter(function (x) { return x; }).map(function (x) {
+            try {
+                return {
+                    key: x.k,
+                    // size: x.s,
+                    parentkey: x.p ? _this.tree[x.p].k : 0
+                };
+            }
+            catch (e) {
+                console.error(e, x);
+            }
+        }).sort(function (a, b) { return _this.comp(a.key, b.key); });
+    };
+    return BST;
+}());
+var Avl = /** @class */ (function (_super) {
+    __extends(Avl, _super);
+    function Avl(comparator) {
+        return _super.call(this, comparator) || this;
+    }
     /**
      * deletes the node of the given reference
      * O(log)
@@ -228,77 +344,6 @@ var Avl = /** @class */ (function () {
             this.tree[node].h = 1 + Math.max((this.tree[node].l ? this.tree[this.tree[node].l].h : 0), (this.tree[node].r ? this.tree[this.tree[node].r].h : 0));
         } while (toRoot && (node = this.tree[node].p));
     };
-    /**
-     * returns a reference for the node with the kth greater key
-     * O(log)
-    */
-    Avl.prototype.kth = function (i) {
-        if (!i)
-            return i;
-        i = +i;
-        var node = this.root;
-        while (node) {
-            if (i > this.tree[node].s)
-                return undefined;
-            var esq = (!this.tree[node].l ? 1 : this.tree[this.tree[node].l].s + 1);
-            if (i === esq)
-                return node;
-            if (i > esq) {
-                i -= esq;
-                node = this.tree[node].r;
-            }
-            else {
-                node = this.tree[node].l;
-            }
-        }
-        return console.error("nao devia chegar aqui");
-    };
-    /**
-     * returns how many nodes has key smaller than or equal to the given key
-     * O(log)
-    */
-    Avl.prototype.order = function (key) {
-        if (key === undefined || key === null)
-            return undefined;
-        var node = this.root;
-        var i = 0;
-        while (node) {
-            var esq = 1 + (this.tree[node].l ? this.tree[this.tree[node].l].s : 0);
-            if (this.comp(key, this.tree[node].k) == 0) {
-                return i + esq;
-            }
-            else if (this.comp(key, this.tree[node].k) > 0) {
-                i += esq;
-                node = this.tree[node].r;
-            }
-            else {
-                node = this.tree[node].l;
-            }
-        }
-        return i;
-    };
-    /**
-     * in order traversal the tree calling the given function for every node, passing two parameters: the key and the value of the node
-     * O(n)
-    */
-    Avl.prototype.inOrder = function (callback) {
-        var s = [];
-        if (this.root)
-            s.push(this.root);
-        while (s.length) {
-            var top_1 = s.pop();
-            if (top_1 < 0) {
-                callback(this.tree[-top_1].k, this.tree[-top_1].v);
-            }
-            else {
-                if (this.tree[top_1].r)
-                    s.push(this.tree[top_1].r);
-                s.push(-top_1);
-                if (this.tree[top_1].l)
-                    s.push(this.tree[top_1].l);
-            }
-        }
-    };
     Avl.prototype.checkConsistence = function () {
         if (!this.root)
             return "no nodes";
@@ -344,31 +389,6 @@ var Avl = /** @class */ (function () {
         return "";
     };
     /**
-     * returns an array with all the nodes with details about the structure of the tree
-    */
-    Avl.prototype.prettify = function () {
-        var _this = this;
-        var nodes = [this.tree[this.root]];
-        for (var i = 0; i < nodes.length; i++) {
-            if (nodes[i].l)
-                nodes.push(this.tree[nodes[i].l]);
-            if (nodes[i].r)
-                nodes.push(this.tree[nodes[i].r]);
-        }
-        return nodes.filter(function (x) { return x; }).map(function (x) {
-            try {
-                return {
-                    key: x.k,
-                    // size: x.s,
-                    parentkey: x.p ? _this.tree[x.p].k : 0
-                };
-            }
-            catch (e) {
-                console.error(e, x);
-            }
-        }).sort(function (a, b) { return _this.comp(a.key, b.key); });
-    };
-    /**
      * returns the height of the tree
      * O(n)
     */
@@ -378,48 +398,12 @@ var Avl = /** @class */ (function () {
         return this.tree[this.root].h;
     };
     return Avl;
-}());
-var Treap = /** @class */ (function () {
+}(BST));
+var Treap = /** @class */ (function (_super) {
+    __extends(Treap, _super);
     function Treap(comparator) {
-        this.tree = [null];
-        this.freeIndexes = [];
-        if (comparator)
-            this.comp = comparator;
-        else
-            this.comp = function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); };
+        return _super.call(this, comparator) || this;
     }
-    Treap.prototype.newPointer = function () {
-        if (this.freeIndexes.length)
-            return this.freeIndexes.pop();
-        this.tree.push(undefined);
-        return this.tree.length - 1;
-    };
-    /**
-     * returns the quantity of node in the tree
-     * O(1)
-    */
-    Treap.prototype.size = function () { return !(this.root) ? 0 : this.tree[this.root].s; };
-    /**
-     * returns an object with key and value of the node from the given reference
-     * O(1)
-    */
-    Treap.prototype.get = function (pointer) { return { key: this.tree[pointer].k, value: this.tree[pointer].v }; };
-    /**
-     * returns a reference for the node with the given key
-     * O(log)
-    */
-    Treap.prototype.find = function (key) {
-        if (key === undefined || key === null)
-            return undefined;
-        var node = this.root;
-        while (node && this.comp(this.tree[node].k, key) != 0) {
-            if (this.comp(this.tree[node].k, key) > 0)
-                node = this.tree[node].l;
-            else
-                node = this.tree[node].r;
-        }
-        return node;
-    };
     /**
      * deletes the node of the given reference
      * O(log)
@@ -438,14 +422,14 @@ var Treap = /** @class */ (function () {
             }
         }
         if (this.tree[node].l || this.tree[node].r) {
-            var parent_1 = this.tree[node].p;
+            var parent_2 = this.tree[node].p;
             var child = this.tree[node].l || this.tree[node].r;
-            this.tree[child].p = parent_1;
-            if (parent_1) {
-                if (this.comp(this.tree[child].k, this.tree[parent_1].k) > 0)
-                    this.tree[parent_1].r = child;
+            this.tree[child].p = parent_2;
+            if (parent_2) {
+                if (this.comp(this.tree[child].k, this.tree[parent_2].k) > 0)
+                    this.tree[parent_2].r = child;
                 else
-                    this.tree[parent_1].l = child;
+                    this.tree[parent_2].l = child;
             }
             else {
                 this.root = child;
@@ -499,42 +483,6 @@ var Treap = /** @class */ (function () {
                 return this.balance(novo);
             }
         }
-    };
-    Treap.prototype.smaller = function (node) {
-        while (this.tree[node].l)
-            node = this.tree[node].l;
-        return node;
-    };
-    Treap.prototype.greater = function (node) {
-        while (this.tree[node].r)
-            node = this.tree[node].r;
-        return node;
-    };
-    /**
-     * return reference for the next node in a in order traversal of the tree
-     * O(1) amortized
-    */
-    Treap.prototype.next = function (node) {
-        if (this.tree[node].r)
-            return this.smaller(this.tree[node].r);
-        while (this.tree[node].p && node == this.tree[this.tree[node].p].r)
-            node = this.tree[node].p;
-        if (this.tree[node].p)
-            return this.tree[node].p;
-        return undefined;
-    };
-    /**
-     * return reference for the previous node in a in order traversal of the tree
-     * O(1) amortized
-    */
-    Treap.prototype.prev = function (node) {
-        if (this.tree[node].l)
-            return this.greater(this.tree[node].l);
-        while (this.tree[node].p && node == this.tree[this.tree[node].p].l)
-            node = this.tree[node].p;
-        if (this.tree[node].p)
-            return this.tree[node].p;
-        return undefined;
     };
     Treap.prototype.balance = function (node) {
         while (this.tree[node].p) {
@@ -604,77 +552,6 @@ var Treap = /** @class */ (function () {
                     (this.tree[node].r ? this.tree[this.tree[node].r].s : 0) + 1;
         } while (toRoot && (node = this.tree[node].p));
     };
-    /**
-     * returns a reference for the node with the kth greater key
-     * O(log)
-    */
-    Treap.prototype.kth = function (i) {
-        if (!i)
-            return i;
-        i = +i;
-        var node = this.root;
-        while (node) {
-            if (i > this.tree[node].s)
-                return undefined;
-            var esq = (!this.tree[node].l ? 1 : this.tree[this.tree[node].l].s + 1);
-            if (i === esq)
-                return node;
-            if (i > esq) {
-                i -= esq;
-                node = this.tree[node].r;
-            }
-            else {
-                node = this.tree[node].l;
-            }
-        }
-        return console.error("nao devia chegar aqui");
-    };
-    /**
-     * returns how many nodes has key smaller than or equal to the given key
-     * O(log)
-    */
-    Treap.prototype.order = function (key) {
-        if (key === undefined || key === null)
-            return undefined;
-        var node = this.root;
-        var i = 0;
-        while (node) {
-            var esq = 1 + (this.tree[node].l ? this.tree[this.tree[node].l].s : 0);
-            if (this.comp(key, this.tree[node].k) == 0) {
-                return i + esq;
-            }
-            else if (this.comp(key, this.tree[node].k) > 0) {
-                i += esq;
-                node = this.tree[node].r;
-            }
-            else {
-                node = this.tree[node].l;
-            }
-        }
-        return i;
-    };
-    /**
-     * in order traversal the tree calling the given function for every node, passing two parameters: the key and the value of the node
-     * O(n)
-    */
-    Treap.prototype.inOrder = function (callback) {
-        var s = [];
-        if (this.root)
-            s.push(this.root);
-        while (s.length) {
-            var top_1 = s.pop();
-            if (top_1 < 0) {
-                callback(this.tree[-top_1].k, this.tree[-top_1].v);
-            }
-            else {
-                if (this.tree[top_1].r)
-                    s.push(this.tree[top_1].r);
-                s.push(-top_1);
-                if (this.tree[top_1].l)
-                    s.push(this.tree[top_1].l);
-            }
-        }
-    };
     Treap.prototype.checkConsistence = function () {
         if (!this.root)
             return "no nodes";
@@ -716,31 +593,6 @@ var Treap = /** @class */ (function () {
         return "";
     };
     /**
-     * returns an array with all the nodes with details about the structure of the tree
-    */
-    Treap.prototype.prettify = function () {
-        var _this = this;
-        var nodes = [this.tree[this.root]];
-        for (var i = 0; i < nodes.length; i++) {
-            if (nodes[i].l)
-                nodes.push(this.tree[nodes[i].l]);
-            if (nodes[i].r)
-                nodes.push(this.tree[nodes[i].r]);
-        }
-        return nodes.filter(function (x) { return x; }).map(function (x) {
-            try {
-                return {
-                    key: x.k,
-                    // size: x.s,
-                    parentkey: x.p ? _this.tree[x.p].k : 0
-                };
-            }
-            catch (e) {
-                console.error(e, x);
-            }
-        }).sort(function (a, b) { return _this.comp(a.key, b.key); });
-    };
-    /**
      * returns the height of the tree
      * O(n)
     */
@@ -768,7 +620,8 @@ var Treap = /** @class */ (function () {
         return ret[this.root];
     };
     return Treap;
-}());
+}(BST));
+
 function shuffle(v) {
     var _a;
     for (var i = v.length - 1; i > 0; --i) {
@@ -776,6 +629,15 @@ function shuffle(v) {
         _a = [v[j], v[i]], v[i] = _a[0], v[j] = _a[1];
     }
 }
+function copy(obj) {
+    if (typeof (obj) != "object")
+        return obj;
+    var ret = Array.isArray(obj) ? [] : {};
+    for (var i in obj)
+        ret[i] = copy(obj[i]);
+    return ret;
+}
+
 function testdiv() {
     document.getElementById("eval").value =
         "console.clear();\nlet n = 1e14 + 1;\nlet cont = [];\nfor (let i = 1; i * i <= n; i++) {\n  if (n % i == 0) {\n    cont.push(i);\n    cont.push(n / i);\n  }\n}\ncont = cont.sort(function (a, b) { return a - b; });\nconsole.log(cont);";
@@ -784,7 +646,11 @@ function testpi() {
     document.getElementById("eval").value =
         "console.clear();\nlet n = 1e7;\nlet cont = 0;\nfor (let i = 1; i <= n; i++) {\n  let x = Math.random();\n  let y = Math.random();\n  if (x * x + y * y <= 1)\n    cont++;\n}\nconsole.log(4 * cont / n);\nconsole.log(Math.PI);";
 }
+
+bstcode = "console.clear();\nlet t = new BST();\nlet n = 2e4;\nlet err = '';\nfor(let i=1; i<=n; i++){\n  let key = 1+Math.random()*n*10>>0;\n  let node = t.find(key);\n  if(node) t.remove(node);\n  else t.add(key);\n  if(i%(n/10) == 0){\n    err = t.checkConsistence();\n    if(err){\n      console.log(i, err);\n      break;\n    }\n  }\n}\nif(!err) console.log(t.height());";
 function testtreap(){
-    document.getElementById("eval").value =
-        "console.clear();\nlet t = new Avl();\nlet n = 2e4;\nlet err = '';\nfor(let i=1; i<=n; i++){\n  let key = 1+Math.random()*n*10>>0;\n  let node = t.find(key);\n  if(node) t.remove(node);\n  else t.add(key);\n  if(i%(n/10) == 0){\n    err = t.checkConsistence();\n    if(err){\n      console.log(i, err);\n      break;\n    }\n  }\n}\nif(!err) console.log(t.height());";
+    document.getElementById("eval").value = bstcode.replace("BST","Treap");
+}
+function testavl(){
+    document.getElementById("eval").value = bstcode.replace("BST","Avl");
 }

@@ -6,12 +6,12 @@ packages included:
 - [Moment.js](https://momentjs.com/)
 - [jQuery](https://jquery.com/)
 
-I also included a implementation of a self-balancing binary search tree. Currently in beta, so it may have bugs.
+I also included a implementation of two self-balancing binary search tree, Treap and Avl. Currently in beta, so it may have bugs.
 
 Usage example:
 ```javascript
 // comparator function is optional
-let t = new Treap((a,b)=>a-b);
+let t = new Avl((a,b)=>a-b); // or new Treap()
 // pair key,value. value is optional
 for(let key of [4,7,6,2,3]) t.add(key,null);
 // array with all nodes of the tree
