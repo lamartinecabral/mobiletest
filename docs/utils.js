@@ -1,3 +1,384 @@
+var Avl = /** @class */ (function () {
+    function Avl(comparator) {
+        this.tree = [null];
+        this.freeIndexes = [];
+        if (comparator)
+            this.comp = comparator;
+        else
+            this.comp = function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); };
+    }
+    Avl.prototype.newPointer = function () {
+        if (this.freeIndexes.length)
+            return this.freeIndexes.pop();
+        this.tree.push(undefined);
+        return this.tree.length - 1;
+    };
+    Avl.prototype.free = function (node) {
+        this.freeIndexes.push(node);
+        delete this.tree[node];
+    };
+    /**
+     * returns the quantity of node in the tree
+     * O(1)
+    */
+    Avl.prototype.size = function () { return !(this.root) ? 0 : this.tree[this.root].s; };
+    /**
+     * returns an object with key and value of the node from the given reference
+     * O(1)
+    */
+    Avl.prototype.get = function (pointer) { return { key: this.tree[pointer].k, value: this.tree[pointer].v }; };
+    /**
+     * returns a reference for the node with the given key
+     * O(log)
+    */
+    Avl.prototype.find = function (key) {
+        if (key === undefined || key === null)
+            return undefined;
+        var node = this.root;
+        while (node && this.comp(this.tree[node].k, key) != 0) {
+            if (this.comp(this.tree[node].k, key) > 0)
+                node = this.tree[node].l;
+            else
+                node = this.tree[node].r;
+        }
+        return node;
+    };
+    Avl.prototype.smaller = function (node) {
+        if (!node || !this.tree[node])
+            return undefined;
+        while (this.tree[node].l)
+            node = this.tree[node].l;
+        return node;
+    };
+    Avl.prototype.greater = function (node) {
+        if (!node || !this.tree[node])
+            return undefined;
+        while (this.tree[node].r)
+            node = this.tree[node].r;
+        return node;
+    };
+    /**
+     * return reference for the next node in a in order traversal of the tree
+     * O(1) amortized
+    */
+    Avl.prototype.next = function (node) {
+        if (this.tree[node].r)
+            return this.smaller(this.tree[node].r);
+        while (this.tree[node].p && node == this.tree[this.tree[node].p].r)
+            node = this.tree[node].p;
+        if (this.tree[node].p)
+            return this.tree[node].p;
+        return undefined;
+    };
+    /**
+     * return reference for the previous node in a in order traversal of the tree
+     * O(1) amortized
+    */
+    Avl.prototype.prev = function (node) {
+        if (this.tree[node].l)
+            return this.greater(this.tree[node].l);
+        while (this.tree[node].p && node == this.tree[this.tree[node].p].l)
+            node = this.tree[node].p;
+        if (this.tree[node].p)
+            return this.tree[node].p;
+        return undefined;
+    };
+    /**
+     * deletes the node of the given reference
+     * O(log)
+    */
+    Avl.prototype.remove = function (node) {
+        var _a, _b;
+        if (!node || !this.tree[node])
+            return false;
+        var node2 = this.smaller(this.tree[node].r) || this.greater(this.tree[node].l);
+        if (!node2) {
+            var parent_1 = this.tree[node].p;
+            if (!parent_1)
+                this.root = undefined;
+            else {
+                this.connect(parent_1, undefined, node);
+                this.updateSize(parent_1, true);
+            }
+            this.free(node);
+            return true;
+        }
+        this.connect(this.tree[node2].p, (this.tree[node2].l || this.tree[node2].r), node2);
+        _a = [this.tree[node].k, this.tree[node2].k], this.tree[node2].k = _a[0], this.tree[node].k = _a[1];
+        _b = [this.tree[node].v, this.tree[node2].v], this.tree[node2].v = _b[0], this.tree[node].v = _b[1];
+        this.updateSize(this.tree[node2].p, true);
+        this.free(node2);
+        return true;
+    };
+    /**
+     * adds a node in the tree with the given key and value and returns the reference of the new node
+     * O(log)
+    */
+    Avl.prototype.add = function (k, v) {
+        var novo = this.newPointer();
+        this.tree[novo] = {
+            k: k,
+            h: 1,
+            v: v,
+            s: 1
+        };
+        if (!this.root)
+            return this.root = novo;
+        var node = this.root;
+        while (true) {
+            if (this.comp(this.tree[node].k, this.tree[novo].k) == 0)
+                return this.remove(novo), undefined;
+            if (this.comp(this.tree[node].k, this.tree[novo].k) > 0) {
+                if (this.tree[node].l) {
+                    node = this.tree[node].l;
+                    continue;
+                }
+            }
+            else {
+                if (this.tree[node].r) {
+                    node = this.tree[node].r;
+                    continue;
+                }
+            }
+            this.connect(node, novo);
+            // this.updateSize(node,true);
+            // console.log("tree before balance", copy(this.tree));
+            this.balance(node);
+            // console.log("tree after balance", copy(this.tree));
+            return novo;
+        }
+    };
+    Avl.prototype.balance = function (node) {
+        var _a;
+        // console.log(node);
+        while (node) {
+            this.updateSize(node);
+            var lheight = (this.tree[node].l ? this.tree[this.tree[node].l].h : 0);
+            var rheight = (this.tree[node].r ? this.tree[this.tree[node].r].h : 0);
+            if (Math.abs(lheight - rheight) <= 1) {
+                node = this.tree[node].p;
+                continue;
+            }
+            var x = "l", y = "r";
+            if (lheight < rheight)
+                _a = [y, x], x = _a[0], y = _a[1];
+            var E = this.tree[this.tree[node][x]][y];
+            if (E && this.tree[E].h == this.tree[node].h - 2) {
+                var upd = this.tree[node][x];
+                if (lheight < rheight)
+                    this.rotateR(this.tree[node][x], false);
+                else
+                    this.rotateL(this.tree[node].l, false);
+                this.updateSize(upd);
+                this.updateSize(this.tree[node][x]);
+            }
+            if (lheight < rheight)
+                this.rotateL(node, false);
+            else
+                this.rotateR(node, false);
+            this.updateSize(node);
+            node = this.tree[node].p;
+        }
+    };
+    Avl.prototype.rotateR = function (node, update) {
+        if (update === void 0) { update = true; }
+        var D = node;
+        var B = this.tree[D].l;
+        var C = this.tree[B].r;
+        this.rotate(D, B, C);
+        if (update)
+            this.updateSize(D, true);
+    };
+    Avl.prototype.rotateL = function (node, update) {
+        if (update === void 0) { update = true; }
+        var D = node;
+        var F = this.tree[D].r;
+        var E = this.tree[F].l;
+        this.rotate(D, F, E);
+        if (update)
+            this.updateSize(D, true);
+    };
+    Avl.prototype.rotate = function (X, Z, Y) {
+        this.connect(this.tree[X].p, Z);
+        this.connect(Z, X);
+        this.connect(X, Y, Z);
+    };
+    Avl.prototype.connect = function (parent, child, cchild) {
+        if (!cchild)
+            cchild = child;
+        if (parent) {
+            if (this.comp(this.tree[parent].k, this.tree[cchild].k) > 0)
+                this.tree[parent].l = child;
+            else
+                this.tree[parent].r = child;
+        }
+        else
+            this.root = child;
+        if (child)
+            this.tree[child].p = parent;
+    };
+    Avl.prototype.updateSize = function (node, toRoot) {
+        if (toRoot === void 0) { toRoot = false; }
+        if (!node)
+            return false;
+        do {
+            this.tree[node].s =
+                (this.tree[node].l ? this.tree[this.tree[node].l].s : 0) +
+                    (this.tree[node].r ? this.tree[this.tree[node].r].s : 0) + 1;
+            this.tree[node].h = 1 + Math.max((this.tree[node].l ? this.tree[this.tree[node].l].h : 0), (this.tree[node].r ? this.tree[this.tree[node].r].h : 0));
+        } while (toRoot && (node = this.tree[node].p));
+    };
+    /**
+     * returns a reference for the node with the kth greater key
+     * O(log)
+    */
+    Avl.prototype.kth = function (i) {
+        if (!i)
+            return i;
+        i = +i;
+        var node = this.root;
+        while (node) {
+            if (i > this.tree[node].s)
+                return undefined;
+            var esq = (!this.tree[node].l ? 1 : this.tree[this.tree[node].l].s + 1);
+            if (i === esq)
+                return node;
+            if (i > esq) {
+                i -= esq;
+                node = this.tree[node].r;
+            }
+            else {
+                node = this.tree[node].l;
+            }
+        }
+        return console.error("nao devia chegar aqui");
+    };
+    /**
+     * returns how many nodes has key smaller than or equal to the given key
+     * O(log)
+    */
+    Avl.prototype.order = function (key) {
+        if (key === undefined || key === null)
+            return undefined;
+        var node = this.root;
+        var i = 0;
+        while (node) {
+            var esq = 1 + (this.tree[node].l ? this.tree[this.tree[node].l].s : 0);
+            if (this.comp(key, this.tree[node].k) == 0) {
+                return i + esq;
+            }
+            else if (this.comp(key, this.tree[node].k) > 0) {
+                i += esq;
+                node = this.tree[node].r;
+            }
+            else {
+                node = this.tree[node].l;
+            }
+        }
+        return i;
+    };
+    /**
+     * in order traversal the tree calling the given function for every node, passing two parameters: the key and the value of the node
+     * O(n)
+    */
+    Avl.prototype.inOrder = function (callback) {
+        var s = [];
+        if (this.root)
+            s.push(this.root);
+        while (s.length) {
+            var top_1 = s.pop();
+            if (top_1 < 0) {
+                callback(this.tree[-top_1].k, this.tree[-top_1].v);
+            }
+            else {
+                if (this.tree[top_1].r)
+                    s.push(this.tree[top_1].r);
+                s.push(-top_1);
+                if (this.tree[top_1].l)
+                    s.push(this.tree[top_1].l);
+            }
+        }
+    };
+    Avl.prototype.checkConsistence = function () {
+        if (!this.root)
+            return "no nodes";
+        if (this.tree[this.root].p)
+            return "root has parent";
+        for (var node = 1; node < this.tree.length; node++) {
+            if (!this.tree[node])
+                continue;
+            for (var _i = 0, _a = ["p", "l", "r", "s"]; _i < _a.length; _i++) {
+                var x = _a[_i];
+                if (this.tree[node][x] && typeof (this.tree[node][x]) != 'number')
+                    return "invalid pointer";
+            }
+            if (!this.tree[node].p) {
+                if (node != this.root)
+                    return "node without parent";
+            }
+            else {
+                if (this.comp(this.tree[this.tree[node].p].k, this.tree[node].k) > 0) {
+                    if (this.tree[this.tree[node].p].l != node)
+                        return "pointer error";
+                }
+                else {
+                    if (this.tree[this.tree[node].p].r != node)
+                        return "pointer error";
+                }
+            }
+            if (this.tree[node].l)
+                if (this.comp(this.tree[this.tree[node].l].k, this.tree[node].k) >= 0)
+                    return "left child key is not less";
+            if (this.tree[node].r)
+                if (this.comp(this.tree[this.tree[node].r].k, this.tree[node].k) <= 0)
+                    return "right child key is not greater";
+            var lsize = (this.tree[node].l ? this.tree[this.tree[node].l].s : 0);
+            var rsize = (this.tree[node].r ? this.tree[this.tree[node].r].s : 0);
+            if (this.tree[node].s != 1 + lsize + rsize)
+                return "wrong size";
+            var lheight = (this.tree[node].l ? this.tree[this.tree[node].l].h : 0);
+            var rheight = (this.tree[node].r ? this.tree[this.tree[node].r].h : 0);
+            if (this.tree[node].h != (lheight > rheight ? lheight : rheight) + 1)
+                return "wrong height";
+        }
+        return "";
+    };
+    /**
+     * returns an array with all the nodes with details about the structure of the tree
+    */
+    Avl.prototype.prettify = function () {
+        var _this = this;
+        var nodes = [this.tree[this.root]];
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].l)
+                nodes.push(this.tree[nodes[i].l]);
+            if (nodes[i].r)
+                nodes.push(this.tree[nodes[i].r]);
+        }
+        return nodes.filter(function (x) { return x; }).map(function (x) {
+            try {
+                return {
+                    key: x.k,
+                    // size: x.s,
+                    parentkey: x.p ? _this.tree[x.p].k : 0
+                };
+            }
+            catch (e) {
+                console.error(e, x);
+            }
+        }).sort(function (a, b) { return _this.comp(a.key, b.key); });
+    };
+    /**
+     * returns the height of the tree
+     * O(n)
+    */
+    Avl.prototype.heigth = function () {
+        if (!this.root)
+            return 0;
+        return this.tree[this.root].h;
+    };
+    return Avl;
+}());
 var Treap = /** @class */ (function () {
     function Treap(comparator) {
         this.tree = [null];
@@ -405,5 +786,5 @@ function testpi() {
 }
 function testtreap(){
     document.getElementById("eval").value =
-        "console.clear();\nlet t = new Treap();\nlet n = 2e4;\nfor(let i=1; i<=n; i++){\n  let key = Math.random()*n*10>>0;\n  let node = t.find(key);\n  if(node) t.remove(node);\n  else t.add(key);\n  if(i%(n/10) == 0){\n    let err = t.checkConsistence();\n    if(err){\n      console.log(i, err);\n      break;\n    }\n  }\n}";
+        "console.clear();\nlet t = new Avl();\nlet n = 2e4;\nfor(let i=1; i<=n; i++){\n  let key = 1+Math.random()*n*10>>0;\n  let node = t.find(key);\n  if(node) t.remove(node);\n  else t.add(key);\n  if(i%(n/10) == 0){\n    let err = t.checkConsistence();\n    if(err){\n      console.log(i, err);\n      break;\n    }\n  }\n}";
 }
