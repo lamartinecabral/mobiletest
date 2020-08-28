@@ -3,9 +3,14 @@ function run(){
 	try {
 		localStorage.setItem("eval", e);
 	} catch(e) { console.error(e); }
+	e = e.split("//");
+	for(let i=1; i<e.length; i++)
+		e[i] = e[i].split("\n").slice(1).join("");
+	e = e.join("");
 	e = e.replace(/\n/g," ");
 	e = e.replace(/console\.log/g,"consolelog");
 	e = e.replace(/console\.clear/g,"clearoutput");
+	console.log(e);
 	try {
 		var before = new Date();
 		var res = eval(e);
@@ -69,13 +74,17 @@ function tabinput(ev){
 }
 
 try {
-	console.log('eruda', eruda, eruda.init() );
+	console.log('eruda', eruda );
+	document.getElementById("eruda-btn").style.display = "unset";
 } catch(e){ console.error(e); }
 try {
 	console.log('rxjs', rxjs);
 } catch(e){ console.error(e); }
 try {
 	console.log('moment()', moment());
+} catch(e){ console.error(e); }
+try {
+	console.log('jquery', $);
 } catch(e){ console.error(e); }
 
 function initEval(first){
@@ -102,4 +111,12 @@ function install(){
 		console.log("A2HS", choice.outcome)
 		installPromptEvent = null;
 	});
+}
+
+didErudaInit = false;
+function toggleEruda(){
+	if(didErudaInit) eruda.destroy();
+	else eruda.init();
+	didErudaInit = !didErudaInit;
+	document.getElementById("eruda-btn").innerText = (didErudaInit ? "Destroy" : "Init")+" Eruda";
 }

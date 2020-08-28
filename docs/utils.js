@@ -372,7 +372,7 @@ var Avl = /** @class */ (function () {
      * returns the height of the tree
      * O(n)
     */
-    Avl.prototype.heigth = function () {
+    Avl.prototype.height = function () {
         if (!this.root)
             return 0;
         return this.tree[this.root].h;
@@ -744,7 +744,7 @@ var Treap = /** @class */ (function () {
      * returns the height of the tree
      * O(n)
     */
-    Treap.prototype.heigth = function () {
+    Treap.prototype.height = function () {
         var ret = {};
         var s = [this.root];
         while (s.length) {
@@ -786,5 +786,5 @@ function testpi() {
 }
 function testtreap(){
     document.getElementById("eval").value =
-        "console.clear();\nlet t = new Avl();\nlet n = 2e4;\nfor(let i=1; i<=n; i++){\n  let key = 1+Math.random()*n*10>>0;\n  let node = t.find(key);\n  if(node) t.remove(node);\n  else t.add(key);\n  if(i%(n/10) == 0){\n    let err = t.checkConsistence();\n    if(err){\n      console.log(i, err);\n      break;\n    }\n  }\n}";
+        "console.clear();\nlet t = new Avl();\nlet n = 2e4;\nlet err = '';\nfor(let i=1; i<=n; i++){\n  let key = 1+Math.random()*n*10>>0;\n  let node = t.find(key);\n  if(node) t.remove(node);\n  else t.add(key);\n  if(i%(n/10) == 0){\n    err = t.checkConsistence();\n    if(err){\n      console.log(i, err);\n      break;\n    }\n  }\n}\nif(!err) console.log(t.height());";
 }
