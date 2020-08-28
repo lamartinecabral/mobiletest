@@ -9,7 +9,7 @@
             "type": "image/png"
         }
     ],
-    "start_url": "/mobiletest",
+    "start_url": "/",
     "display": "standalone",
     "theme_color": "#888888",
     "background_color": "#888888"

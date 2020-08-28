@@ -388,7 +388,7 @@ var Treap = /** @class */ (function () {
     };
     return Treap;
 }());
-function random_shuffle(v) {
+function shuffle(v) {
     var _a;
     for (var i = v.length - 1; i > 0; --i) {
         var j = Math.random() * (i + 1) >> 0;
