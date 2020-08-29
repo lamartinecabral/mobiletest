@@ -3,6 +3,7 @@ function run(){
 	try {
 		localStorage.setItem("eval", e);
 	} catch(e) { console.error(e); }
+	e = "try{\n"+e+"\n}catch(e){console.error(e);}"
 	e = e.split("//");
 	for(let i=1; i<e.length; i++)
 		e[i] = e[i].split("\n").slice(1).join("\n");
@@ -10,6 +11,7 @@ function run(){
 	e = e.replace(/\n/g," ");
 	e = e.replace(/console\.log/g,"consolelog");
 	e = e.replace(/console\.clear/g,"clearoutput");
+	e = e.replace(/console\.error/g,"consoleerror");
 	try {
 		var before = new Date();
 		var res = eval(e);
@@ -21,11 +23,22 @@ function run(){
 }
 
 function consolelog(){
+	console.log.apply(null,arguments);
 	var o = document.getElementById("output");
 	for(var i=0; i<arguments.length; i++){
 		var arg = arguments[i];
-		console.log(arg);
 		if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
+		else o.value += arg+"\n";
+	};
+}
+
+function consoleerror(){
+	console.error.apply(null,arguments);
+	var o = document.getElementById("output");
+	for(var i=0; i<arguments.length; i++){
+		var arg = arguments[i];
+		if(arg && arg.message) o.value += arg.message+"\n";
+		else if(typeof(arg) == "object") o.value += JSON.stringify(arg)+"\n";
 		else o.value += arg+"\n";
 	};
 }

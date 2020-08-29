@@ -39,7 +39,7 @@ var BST = /** @class */ (function () {
      * returns an object with key and value of the node from the given reference
      * O(1)
     */
-    BST.prototype.get = function (pointer) { return { key: this.tree[pointer].k, value: this.tree[pointer].v }; };
+    BST.prototype.get = function (pointer) { if(!pointer || !this.tree[pointer]) return undefined; return { key: this.tree[pointer].k, value: this.tree[pointer].v }; };
     /**
      * returns a reference for the node with the given key
      * O(log)
@@ -97,11 +97,11 @@ var BST = /** @class */ (function () {
         return undefined;
     };
     /**
-     * returns a reference for the node with the kth greater key
+     * returns a reference for the node with the kth smaller key
      * O(log)
     */
     BST.prototype.kth = function (i) {
-        if (!i)
+        if (isNaN(i))
             return i;
         i = +i;
         var node = this.root;
