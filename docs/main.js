@@ -24,7 +24,9 @@ function run(){
 }
 
 function consolelog(){
-	console.log.apply(null,arguments);
+	try{
+		console.log.apply(null,arguments);
+	} catch(e){}
 	var o = document.getElementById("output");
 	for(var i=0; i<arguments.length; i++){
 		var arg = arguments[i];
@@ -34,7 +36,9 @@ function consolelog(){
 }
 
 function consoleerror(){
-	console.error.apply(null,arguments);
+	try{
+		console.error.apply(null,arguments);
+	} catch(e){}
 	var o = document.getElementById("output");
 	for(var i=0; i<arguments.length; i++){
 		var arg = arguments[i];
