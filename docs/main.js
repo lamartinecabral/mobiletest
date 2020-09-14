@@ -101,7 +101,7 @@ try {
 	console.log('moment()', moment());
 } catch(e){ console.error(e); }
 try {
-	console.log('jquery', $);
+	// console.log('jquery', $);
 } catch(e){ console.error(e); }
 
 function initEval(first){
@@ -113,14 +113,15 @@ function initEval(first){
 }
 initEval(true);
 
-
 installPromptEvent = null;
-window.addEventListener('beforeinstallprompt', function(e){
-	console.log('beforeinstallprompt', e);
-	e.preventDefault();
-	installPromptEvent = e;
-	document.getElementById("install-btn").style.display = "unset";
-});
+if("addEventListener" in window){
+	window.addEventListener('beforeinstallprompt', function(e){
+		console.log('beforeinstallprompt', e);
+		e.preventDefault();
+		installPromptEvent = e;
+		document.getElementById("install-btn").style.display = "unset";
+	});
+}
 function install(){
 	installPromptEvent.prompt();
 	installPromptEvent.userChoice.then(function(choice){
