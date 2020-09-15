@@ -646,6 +646,10 @@ function testpi() {
     document.getElementById("eval").value =
         "console.clear();\nlet n = 1e7;\nlet cont = 0;\nfor (let i = 1; i <= n; i++) {\n  let x = Math.random();\n  let y = Math.random();\n  if (x * x + y * y <= 1)\n    cont++;\n}\nconsole.log(4 * cont / n);\nconsole.log(Math.PI);";
 }
+function testmem() {
+    document.getElementById("eval").value =
+        "let x = [];\nlet n = 5e5;\nfor(let i=0; i<n; i++){\n  let k = {};\n  k[i] = i+' km';\n  x.push(k);\n}\nconsole.log(x.length);";
+}
 
 bstcode = "console.clear();\nlet t = new BST();\nlet n = 2e4;\nlet err = '';\nfor(let i=1; i<=n; i++){\n  let key = 1+Math.random()*n*10>>0;\n  let node = t.find(key);\n  if(node) t.remove(node);\n  else t.add(key);\n  if(i%(n/10) == 0){\n    err = t.checkConsistence();\n    if(err){\n      console.log(i, err);\n      break;\n    }\n  }\n}\nif(!err) console.log(t.height());";
 function testtreap(){
