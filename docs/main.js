@@ -3,7 +3,7 @@ function run(){
 	try {
 		localStorage.setItem("eval", e);
 	} catch(e) { console.error(e); }
-	e = "try{\n"+e+"\n}catch(e){console.error(e);}"
+	e = "(function(){try{\n"+e+"\n}catch(e){console.error(e);}})();"
 	e = e.split("//");
 	for(var i=1; i<e.length; i++){
 		e[i] = e[i].split("\n").slice(1).join("\n");
@@ -144,3 +144,5 @@ function asset(e){
 	script.setAttribute('src','./assets/'+e.target.src.split("/").slice(-1));
 	document.head.appendChild(script);
 }
+
+mobiletestVersion = "20110111.0";

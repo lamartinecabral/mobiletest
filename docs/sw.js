@@ -1,5 +1,5 @@
 // use a cacheName for cache versioning
-var cacheName = 'v20200828.2';
+var cacheName = 'v20210111.0';
 
 var static = [
 	'./assets/favicon.ico',
